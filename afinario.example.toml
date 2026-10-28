@@ -1,0 +1,18 @@
+# Copie para afinario.local.toml. Não coloque credenciais neste arquivo.
+# A chave é lida de AFINARIO_ACOUSTID_KEY no ambiente.
+[network]
+timeout_seconds = 30
+attempts = 2
+user_agent = "Afinario/0.1.0 (local provider feasibility probe)"
+shazam_interval_seconds = 3
+
+[processing]
+analysis_workers = 2
+# Limite local por execução, não a franquia mensal da conta. 0 bloqueia novas chamadas.
+audd_max_requests = 0
+
+[tools]
+# Um nome no PATH ou um caminho absoluto. Nunca é executado por shell.
+ffmpeg = "ffmpeg"
+ffprobe = "ffprobe"
+fpcalc = "fpcalc"
