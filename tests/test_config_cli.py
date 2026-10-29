@@ -1,5 +1,8 @@
 import json
 import logging
+import shutil
+import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -98,3 +101,70 @@ def test_audd_token_and_concurrency_config_are_loaded_without_repr_leak(tmp_path
     assert settings.audd_max_requests == 10
     assert settings.shazam_interval_seconds == 5
     assert "AUDD-TOKEN-SECRET" not in repr(settings)
+
+
+def test_cli_scan_persists_records_and_reuses_ids(tmp_path, capsys):
+    from afinario.library import LibraryStore
+
+    shutil.copyfile(Path(__file__).parent / "fixtures" / "tone.mp3", tmp_path / "one.mp3")
+    assert main(["scan", str(tmp_path)]) == 0
+    first = json.loads(capsys.readouterr().out)
+    assert main(["scan", str(tmp_path)]) == 0
+    second = json.loads(capsys.readouterr().out)
+    assert first["records"][0]["id"] == second["records"][0]["id"]
+    with LibraryStore() as db:
+        assert db.load().records[0].id == first["records"][0]["id"]
+
+
+def test_cli_reports_persistence_failure_without_traceback_or_mutating_audio(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    from afinario.library import LibraryStore
+
+    audio = tmp_path / "one.mp3"
+    shutil.copyfile(Path(__file__).parent / "fixtures" / "tone.mp3", audio)
+    original = audio.read_bytes()
+
+    def fail(*args, **kwargs):
+        raise sqlite3.OperationalError("PRIVATE diagnostic")
+
+    monkeypatch.setattr(LibraryStore, "save_scan_records", fail)
+    assert main(["scan", str(tmp_path)]) == 2
+    captured = capsys.readouterr()
+    assert "Falha ao salvar" in captured.err
+    assert "PRIVATE" not in captured.err
+    assert audio.read_bytes() == original
+
+
+def test_doctor_uses_saved_credentials_without_exporting_values(monkeypatch, capsys):
+    from afinario.credentials import CredentialStore
+
+    CredentialStore().save(Settings(acoustid_key="TEST-KEY", audd_token="TEST-TOKEN"))
+    monkeypatch.setattr(
+        "afinario.cli.doctor",
+        lambda settings: {
+            "acoustid_key_configured": bool(settings.acoustid_key),
+            "audd_token_configured": bool(settings.audd_token),
+        },
+    )
+    assert main(["doctor"]) == 0
+    output = capsys.readouterr().out
+    report = json.loads(output)
+    assert report["environment"]["audd_token_configured"]
+    assert "TEST-KEY" not in output and "TEST-TOKEN" not in output
+
+
+def test_cli_scan_preserves_previously_saved_service_settings(tmp_path, capsys):
+    from afinario.library import LibraryPreferences, LibraryStore
+
+    with LibraryStore() as library:
+        library.save_preferences(
+            LibraryPreferences(settings=Settings(fpcalc="saved-tool").public_data())
+        )
+    shutil.copyfile(Path(__file__).parent / "fixtures/tone.mp3", tmp_path / "one.mp3")
+    assert main(["scan", str(tmp_path)]) == 0
+    capsys.readouterr()
+    with LibraryStore() as library:
+        assert library.load().preferences.settings["tools"]["fpcalc"] == "saved-tool"

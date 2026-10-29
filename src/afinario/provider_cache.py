@@ -8,7 +8,13 @@ import time
 from dataclasses import asdict, replace
 from pathlib import Path
 
-from afinario.domain import ProviderResult, RecordingCandidate, ReleaseCandidate, Status
+from afinario.domain import (
+    LyricCandidate,
+    ProviderResult,
+    RecordingCandidate,
+    ReleaseCandidate,
+    Status,
+)
 
 
 def cache_key(provider: str, *query_parts) -> str:
@@ -72,9 +78,15 @@ class ProviderCache:
                 return None
             candidates = []
             for value in data["candidates"]:
-                for name in ("title_aliases", "artist_aliases", "isrcs"):
-                    value[name] = tuple(value.get(name, []))
-                candidate = RecordingCandidate(**value)
+                kind = value.pop("candidate_type", "recording")
+                if kind == "lyric":
+                    candidate = LyricCandidate(**value)
+                elif kind == "recording":
+                    for name in ("title_aliases", "artist_aliases", "isrcs"):
+                        value[name] = tuple(value.get(name, []))
+                    candidate = RecordingCandidate(**value)
+                else:
+                    return None
                 if candidate.provider != provider or (
                     candidate.external_id is not None and not isinstance(candidate.external_id, str)
                 ):
@@ -99,7 +111,10 @@ class ProviderCache:
     def _put(self, key: str, result: ProviderResult) -> None:
         if result.status not in (Status.OK, Status.NOT_FOUND):
             return
-        if any(not isinstance(candidate, RecordingCandidate) for candidate in result.candidates):
+        if any(
+            not isinstance(candidate, (RecordingCandidate, LyricCandidate))
+            for candidate in result.candidates
+        ):
             return
         expires = time.time() + (30 * 86400 if result.status == Status.OK else 86400)
         self.memory[key] = (expires, result)
@@ -109,7 +124,17 @@ class ProviderCache:
                     {
                         "provider": result.provider,
                         "status": result.status.value,
-                        "candidates": [asdict(candidate) for candidate in result.candidates],
+                        "candidates": [
+                            {
+                                **asdict(candidate),
+                                "candidate_type": (
+                                    "lyric"
+                                    if isinstance(candidate, LyricCandidate)
+                                    else "recording"
+                                ),
+                            }
+                            for candidate in result.candidates
+                        ],
                         "releases": [asdict(release) for release in result.releases],
                     },
                     ensure_ascii=True,

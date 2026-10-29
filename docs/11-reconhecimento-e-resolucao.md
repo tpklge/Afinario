@@ -21,13 +21,13 @@ uv run --no-sync python -m afinario gui
 4. Selecione linhas e clique em Identificar selecionadas, ou use Identificar biblioteca para todos os arquivos legíveis do inventário. O segundo botão inclui registros ocultos pelo filtro textual; a seleção individual respeita as linhas escolhidas.
 5. Confira artista/título propostos, identificação e fontes na tabela. As colunas atuais permanecem separadas. A aba Reconhecimento mostra resultados de cada serviço, aliases, MBID, ISRC, scores originais e lançamentos possíveis. A divisão vertical entre tabela e detalhes pode ser arrastada.
 
-Identificar é uma consulta online quando não há cache. AcoustID recebe fingerprint e duração; ShazamIO recebe uma assinatura derivada de um trecho local; MusicBrainz recebe MBIDs. Arquivos, capas, letras existentes, nomes e diretórios não são alterados. As propostas ainda não têm ação de aprovação/aplicação.
+Identificar é uma consulta online quando não há cache. AcoustID recebe fingerprint e duração; ShazamIO recebe uma assinatura derivada de um trecho local; MusicBrainz recebe MBIDs. Arquivos, capas, letras existentes, nomes e diretórios não são alterados. As propostas agora podem ser revisadas e aprovadas por campo em Revisar e aprovar, conforme [Credenciais, letras e aprovação](14-credenciais-letras-e-aprovacao.md). Aplicação em tags/nomes permanece futura.
 
 ## Configuração e diagnóstico
 
 O comando gui e o executável afinario-desktop carregam `afinario.local.toml` da pasta atual quando existe. Configuração explícita também é aceita: `python -m afinario --config caminho.toml gui`. O diálogo de serviços permite ajustar fpcalc, FFmpeg, ffprobe e chave AcoustID sem reiniciar a janela.
 
-A chave vem do ambiente, com fallback para a variável persistente do usuário no Windows, ou pode ser informada no diálogo com exibição mascarada. Uma alteração de chave não é salva pelo aplicativo. Não incluir credenciais em TOML, relatórios ou código.
+A chave vem do ambiente, com fallback para a variável persistente do usuário no Windows, ou pode ser informada no diálogo com exibição mascarada. Salvar configurações grava as credenciais no cofre nativo do usuário, fora do banco e do repositório. Não incluir credenciais em TOML, relatórios ou código.
 
 AcoustID precisa de fpcalc para novas consultas. ShazamIO precisa do extra recognition e FFmpeg; ffprobe é usado quando a duração local ainda não é conhecida. O MusicBrainz não conta como reconhecedor independente. Suas consultas usam o User-Agent configurado em network.user_agent; configure uma identificação significativa e contato real antes de uma distribuição pública.
 
@@ -41,7 +41,7 @@ Cancelar interrompe etapas seguintes, esperas de quota e processos locais. Uma r
 
 ## Cache
 
-O arquivo `recognition-v1.sqlite3` fica no diretório de cache retornado por platformdirs. É separado do futuro banco da biblioteca. Se não for possível abri-lo, o lote usa cache em memória e registra a ocorrência.
+O arquivo `recognition-v1.sqlite3` fica no diretório de cache retornado por platformdirs. É separado do banco library.sqlite3 da biblioteca, conforme [Persistência](13-persistencia-da-biblioteca.md). Candidatos e propostas da biblioteca permanecem disponíveis após fechar/reabrir, mesmo sem o cache de consultas. Se não for possível abri-lo, o lote usa cache em memória e registra a ocorrência.
 
 Chaves de consulta são hashes versionados por provedor: reconhecimento usa o hash completo do arquivo; metadados usam MBID. Não são armazenadas chaves de acesso, fingerprints, trechos, letras ou respostas brutas. Candidatos, aliases e alternativas de lançamento são persistidos normalizados. Os resultados não tornam dois arquivos iguais por identidade acústica.
 
@@ -56,7 +56,7 @@ TTL positivo: 30 dias. Ausência de correspondência: 24 horas. Falhas transitó
 | Candidatos próximos, evidência fraca, artistas/títulos/IDs ou versões incompatíveis. | Revisão necessária, sem campos propostos automaticamente. |
 | Duração de candidato incompatível com a duração do arquivo. | Revisão necessária. |
 | Todas as fontes consultadas retornam sem resultado. | Não identificada. |
-| Não há resultado utilizável por falha de serviço/configuração. | Análise pendente, com motivo por fonte. |
+| Não há resultado utilizável por falha de serviço/configuração. | Consulta bloqueada ou falhou, com motivo por fonte. |
 | Arquivo mudou desde o inventário ou durante a análise. | Arquivo alterado; refazer varredura. |
 
 Normalizar caixa, pontuação, caracteres de largura diferente e acentos latinos. Preservar sinais significativos de outros alfabetos, inclusive dakuten japonês. Títulos em idiomas diferentes só são aproximados por aliases conhecidos; não usar traduções inventadas, recortes arbitrários de título ou tags existentes para vencer divergências do áudio.
@@ -81,3 +81,5 @@ Os testes determinísticos cobrem aliases multilíngues, versões, duração, ca
 Resultado da suíte: **132 testes aprovados e um pulado** por restrição local para criar symlinks, com lint/formatação aprovados e wheel gerado. O teste de symlinks deve executar nas plataformas com permissão apropriada.
 
 Documentação primária usada para a integração: [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API), [limites de acesso](https://musicbrainz.org/doc/MusicBrainz_API/Rate_Limiting) e [conceito de gravação](https://musicbrainz.org/doc/Recording). Uma gravação pode aparecer em vários lançamentos; essa relação não determina a edição do arquivo local.
+
+Atualização posterior: o [diagnóstico e player](15-diagnostico-e-player.md) detalha os rótulos de bloqueio, a recusa de chave AcoustID com HTTP 400, o histórico de propostas divergentes e a reprodução local para revisão.

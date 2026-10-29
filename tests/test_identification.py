@@ -140,6 +140,46 @@ def test_missing_key_can_still_use_authorized_shazam(source, transport_factory, 
     assert result.decision.artist == "True artist"
 
 
+def test_provider_exception_does_not_discard_other_successful_sources(
+    source, transport_factory, services, monkeypatch
+):
+    def broken(*_):
+        raise RuntimeError("PRIVATE-TOKEN")
+
+    monkeypatch.setattr(IdentificationService, "_shazam", broken)
+    service = IdentificationService(
+        Settings(acoustid_key="key"), transport_factory(lambda _: None), ProviderCache()
+    )
+    report = service.identify(read_track(source), RecognitionOptions(shazamio=True))
+    assert report.decision.status == DecisionStatus.INCOMPLETE
+    assert report.decision.title == "True title"
+    assert next(r for r in report.results if r.provider == "shazamio").status == Status.UNAVAILABLE
+    assert "PRIVATE-TOKEN" not in str(report.summary())
+
+
+def test_changed_identification_requires_review_for_the_same_audio():
+    from dataclasses import replace
+
+    from afinario.identification import IdentificationReport, compare_history
+    from afinario.resolver import Decision
+
+    old = IdentificationReport(
+        "id",
+        "track.mp3",
+        Decision(DecisionStatus.INCOMPLETE, "Artist", "First title"),
+        source_sha256="same-audio",
+    )
+    new = replace(old, decision=Decision(DecisionStatus.AGREEMENT, "Artist", "Second title"))
+    guarded = compare_history(new, [old])
+    assert guarded.decision.status == DecisionStatus.CONFLICT
+    assert not guarded.decision.proposed_fields
+    assert guarded.results[-1].candidates[0].title == "First title"
+    assert "Second title" in " ".join(guarded.decision.reasons)
+    assert compare_history(new, [replace(old, source_sha256="different-audio")]) == new
+    spelling = replace(old, decision=Decision(DecisionStatus.INCOMPLETE, "ARTIST", "First-title"))
+    assert compare_history(spelling, [old]) == spelling
+
+
 def test_disabled_shazam_is_never_called(source, transport_factory, services):
     service = IdentificationService(
         Settings(acoustid_key="key"), transport_factory(lambda _: None), ProviderCache()

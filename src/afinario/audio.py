@@ -15,7 +15,9 @@ from afinario.transport import ProviderError
 def executable(command: str) -> str:
     resolved = shutil.which(command)
     if resolved is None:
-        raise ProviderError(Status.BLOCKED, "Executável auxiliar não encontrado no PATH.")
+        raise ProviderError(
+            Status.BLOCKED, f"Executável auxiliar não encontrado no PATH: {Path(command).name}."
+        )
     return resolved
 
 

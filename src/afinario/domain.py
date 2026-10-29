@@ -50,6 +50,7 @@ class LyricCandidate:
     title: str | None = None
     artist: str | None = None
     duration: float | None = None
+    source: str | None = None
 
 
 @dataclass(frozen=True)

@@ -52,6 +52,8 @@ class Transport:
             "musicbrainz": 1.05,
             "shazamio": settings.shazam_interval_seconds,
             "audd": 0,
+            "lrclib": 0.5,
+            "lyrics.ovh": 1,
         }
 
     def close(self) -> None:
@@ -168,6 +170,7 @@ class Transport:
         url: str,
         attempt: int,
         before_send: Callable[[], None] | None = None,
+        application_error_statuses: tuple[int, ...] = (),
         **kwargs: Any,
     ):
         with (
@@ -196,8 +199,10 @@ class Transport:
                     attempt,
                     retry_after_seconds=delay,
                 )
-            if not 200 <= code < 300:
-                raise ProviderError(Status.INVALID, "Resposta HTTP inesperada.", attempt)
+            if not 200 <= code < 300 and code not in application_error_statuses:
+                raise ProviderError(
+                    Status.INVALID, f"Resposta HTTP inesperada (HTTP {code}).", attempt
+                )
             if "json" not in response.headers.get("Content-Type", "").lower():
                 raise ProviderError(Status.INVALID, "Resposta não é JSON.", attempt)
             body = bytearray()
@@ -207,9 +212,16 @@ class Transport:
                 if len(body) > 2_000_000:
                     raise ProviderError(Status.INVALID, "Resposta excede o limite.", attempt)
             try:
-                return json.loads(body)
+                data = json.loads(body)
             except (ValueError, UnicodeError) as exc:
                 raise ProviderError(Status.INVALID, "JSON inválido.", attempt) from exc
+            if not 200 <= code < 300 and (
+                not isinstance(data, dict) or data.get("status") != "error"
+            ):
+                raise ProviderError(
+                    Status.INVALID, f"Resposta HTTP inesperada (HTTP {code}).", attempt
+                )
+            return data
 
     def json(
         self,
@@ -219,6 +231,7 @@ class Transport:
         *,
         max_attempts: int | None = None,
         before_send: Callable[[], None] | None = None,
+        application_error_statuses: tuple[int, ...] = (),
         **kwargs: Any,
     ) -> tuple[Any, int]:
         limit = self.settings.attempts if max_attempts is None else max_attempts
@@ -226,7 +239,15 @@ class Transport:
             raise ValueError("Número de tentativas inválido.")
         for attempt in range(1, limit + 1):
             try:
-                return self._request(provider, method, url, attempt, before_send, **kwargs), attempt
+                return self._request(
+                    provider,
+                    method,
+                    url,
+                    attempt,
+                    before_send,
+                    application_error_statuses=application_error_statuses,
+                    **kwargs,
+                ), attempt
             except ProviderError as exc:
                 if (
                     exc.status not in (Status.RATE_LIMIT, Status.UNAVAILABLE)

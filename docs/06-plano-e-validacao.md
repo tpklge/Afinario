@@ -1,6 +1,6 @@
 # Plano de implementação e validação
 
-Este plano descreve a evolução do projeto. A base técnica dos itens 1 e 2 está implementada; E0 tem validação parcial registrada em [Validação inicial](09-validacao-inicial.md). Os itens 4 e 5 da lista de implementação estão entregues como inventário em memória e interface básica, conforme [Inventário e interface](10-inventario-e-interface.md). E1 ainda depende da persistência SQLite do item 3 para estar completa. As etapas de aplicação musical permanecem futuras. Linux é prioritário, com macOS 15 Sequoia+ posteriormente.
+Este plano descreve a evolução do projeto. A base técnica dos itens 1 e 2 está implementada; E0 tem validação parcial registrada em [Validação inicial](09-validacao-inicial.md). Os itens 4 e 5 da lista de implementação estão entregues como inventário em memória e interface básica, conforme [Inventário e interface](10-inventario-e-interface.md). A persistência SQLite do antigo item 3 está implementada, conforme [Persistência da biblioteca](13-persistencia-da-biblioteca.md); E1 ainda requer homologação prática nos sistemas alvo. E4/E5 têm implementação inicial descrita em [Aplicação e restauração](16-planejamento-aplicacao-e-restauracao.md), ainda sujeita à homologação Windows e testes ampliados por volume/formato. A orientação atual prioriza compatibilidade com macOS 15 Sequoia+ e Windows 11, mantendo Linux como plataforma adicional. A ordem Linux/macOS registrada nas entregas abaixo é histórica e não dispensa validação em Windows 11.
 
 ## Entregas e dependências
 
@@ -18,7 +18,7 @@ Este plano descreve a evolução do projeto. A base técnica dos itens 1 e 2 est
 
 E1 pode ser preparada enquanto E0 é investigada, mas o requisito de dois reconhecedores continua pendente até sua demonstração. E4 depende das decisões de E2/E3. E5 exige plano estável e é obrigatória antes de liberar qualquer escrita ao usuário. A primeira versão utilizável reúne E1 a E7 com as integrações validadas de E0.
 
-Atualização dos itens 6 a 8: E2 tem adaptadores integrados à janela, cache, comparação de candidatos e enriquecimento MusicBrainz, com evidência real registrada em [Reconhecimento e resolução](11-reconhecimento-e-resolucao.md). Isso não encerra a calibração de confiança, a persistência completa nem a homologação nas plataformas alvo. E3 (letras na interface) continua futura; as consultas de letras do probe permanecem disponíveis.
+Atualização dos itens 6 a 8: E2 tem adaptadores integrados à janela, cache, comparação de candidatos e enriquecimento MusicBrainz, com evidência real registrada em [Reconhecimento e resolução](11-reconhecimento-e-resolucao.md). Isso não encerra a calibração de confiança nem a homologação nas plataformas alvo. Inventário, candidatos e propostas agora têm persistência SQLite; a fila persistente com pausa e retomada está implementada no escopo inicial de E6, conforme [Automação, lotes e relatórios](17-automacao-lotes-e-relatorios.md). E3 tem letras públicas na interface, importação local, comparação e aprovação por campo implementadas, conforme [Credenciais, letras e aprovação](14-credenciais-letras-e-aprovacao.md). As consultas de letras do probe continuam disponíveis. A aplicação com backup e restauração está implementada em E4/E5. E6 inclui relatórios CSV/JSON, checkpoints e orçamento AudD persistente; a homologação nativa Windows, distribuição e piloto permanecem pendentes.
 
 ## Matriz de validação
 
@@ -73,3 +73,5 @@ Requisitos obrigatórios rastreados; testes aplicáveis aprovados; recuperação
 | Nome Afinário e licença final. | Validar antes da identidade pública e da distribuição. |
 
 Não há estimativa de calendário nesta documentação: ela depende da prova das integrações, do tamanho da equipe e da disponibilidade de arquivos/dispositivos de teste.
+
+Atualização de aplicação: E4/E5 incluem prévia, nomes portáveis, renomeação por concordância, escritores por campo nos formatos prioritários, backups verificados, diário, recuperação e restauração. Ciclos de nomes manuais são detectados e bloqueados; execução de ciclos e homologação de volumes continuam pendentes. E6 inclui pausa/retomada persistente e relatórios CSV/JSON, conforme a entrega 17. Empacotamento e homologação nativa Windows continuam pendentes; o [guia Windows 11](18-teste-no-windows-11.md) orienta o teste pelo código-fonte.

@@ -221,6 +221,7 @@ def scan(
     on_record: Callable[[InventoryRecord], None] = lambda _: None,
     on_issue: Callable[[ScanIssue], None] = lambda _: None,
     on_progress: Callable[[ScanSummary], None] = lambda _: None,
+    known_records: dict | None = None,
 ) -> ScanSummary:
     """Uma passagem, sem seguir links; pastas sobrepostas não duplicam arquivos."""
     if not formats or formats - ALL_FORMATS:
@@ -251,6 +252,8 @@ def scan(
                     if stop.is_set():
                         break
                     candidate = Path(entry.path)
+                    if entry.name.startswith(".afinario-"):
+                        continue
                     try:
                         entry_info = entry.stat(follow_symlinks=False)
                         if is_link(candidate, entry_info):
@@ -269,7 +272,14 @@ def scan(
                         seen_files.add(key)
                         summary.visited_files += 1
                         try:
-                            record = read_track(candidate)
+                            known = (known_records or {}).get(str(candidate.absolute()))
+                            record = (
+                                known
+                                if known
+                                and (known.size, known.mtime_ns)
+                                == (entry_info.st_size, entry_info.st_mtime_ns)
+                                else read_track(candidate)
+                            )
                             if record is None or record.format not in formats:
                                 summary.ignored_files += 1
                             else:

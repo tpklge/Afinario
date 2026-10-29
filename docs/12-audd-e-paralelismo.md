@@ -10,7 +10,7 @@ Reabra a janela atualizada:
 .\.venv\Scripts\python.exe -m afinario gui
 ```
 
-1. Em Reconhecer → Serviços e ferramentas…, informe o Token AudD no campo mascarado e confirme Usar nesta sessão. Ele não será gravado pelo diálogo.
+1. Em Reconhecer → Serviços e ferramentas…, informe o Token AudD no campo mascarado e confirme Salvar configurações. Ele será gravado no cofre nativo deste usuário, fora do projeto e do GitHub.
 2. Marque Usar AudD (plano pago). Para usar duas fontes independentes sem ShazamIO, mantenha AcoustID e AudD habilitados e desmarque ShazamIO.
 3. Defina Limite AudD nesta execução. Comece com 1 e selecione uma música para validar o token. O padrão 0 bloqueia novas consultas, mas permite aproveitar cache válido.
 4. Clique em Identificar selecionadas ou Identificar biblioteca. A janela informa tentativas reservadas/limite e mostra resultados AudD nos detalhes e nas fontes.
@@ -58,7 +58,7 @@ As cotas são compartilhadas dentro de uma execução da aplicação; múltiplos
 
 ## Ajustes opcionais
 
-Em Serviços e ferramentas…, ajustar Músicas em paralelo (1–4) e Intervalo mínimo ShazamIO (1–300 s). Para persistir apenas parâmetros sem credenciais, adicionar ao TOML:
+Em Serviços e ferramentas…, ajustar Músicas em paralelo (1–4) e Intervalo mínimo ShazamIO (1–300 s). Os parâmetros públicos também são salvos pela interface. Para defini-los explicitamente em arquivo, sem credenciais, adicionar ao TOML:
 
 ```toml
 [network]

@@ -9,11 +9,12 @@ from afinario.transport import ProviderError, Transport
 
 
 class AudDBudget:
-    def __init__(self, limit: int = 0):
+    def __init__(self, limit: int = 0, *, used: int = 0, on_reserve=None):
         if type(limit) is not int or limit < 0:
             raise ValueError("Limite AudD inválido.")
         self.limit = limit
-        self._used = 0
+        self._used = used
+        self._on_reserve = on_reserve
         self._lock = threading.Lock()
 
     @property
@@ -26,6 +27,8 @@ class AudDBudget:
             if self._used >= self.limit:
                 raise ProviderError(Status.BLOCKED, "Limite AudD desta execução atingido.")
             # Never refund an uncertain delivery: the server may have processed it.
+            if self._on_reserve:
+                self._on_reserve(self._used + 1)
             self._used += 1
 
 

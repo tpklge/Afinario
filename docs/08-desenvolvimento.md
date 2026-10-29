@@ -2,9 +2,9 @@
 
 ## Plataforma e limites atuais
 
-O núcleo é Python 3.11–3.13, executado diretamente no sistema. Linux, inicialmente Ubuntu 24.04 x86_64, é o alvo prioritário. macOS 15 Sequoia ou superior terá validação própria em Apple Silicon e Intel. Windows permite desenvolver e testar o núcleo. Não usar Wine nem APIs Windows no domínio.
+O núcleo é Python 3.11–3.13, executado diretamente no sistema. macOS 15 Sequoia ou superior e Windows 11 são os alvos atuais de desenvolvimento. macOS exige validação própria em Apple Silicon e Intel. Linux, inicialmente Ubuntu 24.04 x86_64, continua na matriz. Não usar Wine nem APIs Windows no domínio.
 
-A interface desktop usa Qt Widgets pelo extra PySide6-Essentials. A CLI possui os comandos gui e scan, além de doctor e probe. A janela também reconhece áudio e compara candidatos. A base da biblioteca continua em memória; o cache de consultas tem SQLite próprio. Nenhuma função edita tags ou nomes. Consulte [Inventário e interface](10-inventario-e-interface.md) e [Reconhecimento](11-reconhecimento-e-resolucao.md).
+A interface desktop usa Qt Widgets (PySide6-Essentials) e um player local com Qt Multimedia (PySide6-Addons). Os extras gui e gui-test incluem ambos os pacotes. A CLI possui os comandos gui e scan, além de doctor e probe. A janela também reconhece áudio e compara candidatos. A biblioteca usa SQLite com migrações e restauração automática; o cache de consultas tem SQLite separado. Consulte [Persistência](13-persistencia-da-biblioteca.md) para os locais de dados, recuperação e precedência das preferências. A aba Aplicar e restaurar grava campos aprovados, renomeia com concordância suficiente e permite restaurar backups; veja [Aplicação](16-planejamento-aplicacao-e-restauracao.md). Consulte [Inventário e interface](10-inventario-e-interface.md) e [Reconhecimento](11-reconhecimento-e-resolucao.md).
 
 ## Instalação reprodutível com uv
 
@@ -40,7 +40,7 @@ Copie `afinario.example.toml` para `afinario.local.toml` para configurar caminho
 uv run --locked afinario --config afinario.local.toml doctor
 ```
 
-Os comandos doctor, probe e scan usam padrões internos quando `--config` não é informado. A interface gui e afinario-desktop carregam `afinario.local.toml` da pasta de execução se existir; `--config` explícito prevalece. Esse arquivo local é configuração confiável do usuário e pode indicar executáveis. Credenciais não são aceitas no TOML. A chave AcoustID vem de `AFINARIO_ACOUSTID_KEY` ou do diálogo de serviços (somente sessão). No Windows, há fallback de leitura da variável persistente do usuário para IDEs abertas antes da configuração. Não usar chave de submissão. Backends de cofre do sistema continuam futuros.
+Os comandos doctor, probe e scan usam padrões internos quando `--config` não é informado. A interface gui e afinario-desktop carregam `afinario.local.toml` da pasta de execução se existir; `--config` explícito prevalece. Esse arquivo local é configuração confiável do usuário e pode indicar executáveis. Credenciais não são aceitas no TOML nem são gravadas no banco. Configuração TOML tem precedência sobre parâmetros salvos pela interface; sem TOML, parâmetros públicos salvos no mesmo sistema são restaurados. A chave AcoustID vem do cofre nativo, de `AFINARIO_ACOUSTID_KEY` ou do diálogo de serviços, que agora permite salvar no cofre. No Windows, há fallback de leitura da variável persistente do usuário para IDEs abertas antes da configuração. Não usar chave de submissão. Keychain no macOS e WinVault no Windows persistem as credenciais fora do projeto; Secret Service é o backend adicional no Linux. Valores salvos prevalecem sobre o ambiente; campos salvos vazios desativam o serviço.
 
 ## Prova de letras
 
@@ -72,7 +72,7 @@ Cada reconhecimento Shazam roda em subprocesso com prazo total e fechamento do c
 
 ## Relatórios e códigos de saída
 
-Acrescente `--report caminho-novo.json` a `doctor`, `probe` ou `scan`. O diretório pai deve existir. O comando cria arquivo exclusivamente e recusa sobrescrever qualquer arquivo existente, inclusive músicas. O relatório também é impresso na saída padrão. A interface atual não exporta relatórios; use scan pela CLI para isso.
+Acrescente `--report caminho-novo.json` a `doctor`, `probe` ou `scan`. O diretório pai deve existir. O comando cria arquivo exclusivamente e recusa sobrescrever qualquer arquivo existente, inclusive músicas. O relatório também é impresso na saída padrão. A interface exporta CSV/JSON pela aba **Lotes e relatórios**, conforme [Automação, lotes e relatórios](17-automacao-lotes-e-relatorios.md).
 
 Relatórios não contêm texto completo de letras, fingerprint, amostras de áudio ou credenciais. O diagnóstico local contém caminhos de dados do usuário; revisar antes de compartilhar.
 
@@ -102,6 +102,9 @@ Doctor pode retornar 0 mesmo com ferramentas ausentes: sua função é diagnosti
 | audd.py | Endpoint AudD standard e reserva atômica de consultas por lote. |
 | cancellation.py | Cancelamento e execução limitada de processos auxiliares. |
 | inventory.py | Descoberta local, formatos reais, tags, estatísticas e cancelamento. |
+| library.py / ui/library_worker.py | Biblioteca SQLite, migrações, snapshots, lotes, propostas, preferências e restauração fora da thread da interface. |
+| credentials.py | Cofre nativo por usuário, com substituição das credenciais em uma entrada. |
+| lyrics.py / review.py / ui/review_panel.py | Busca/importação, comparação e aprovação versionada por campo. |
 | ui/ | Interface Qt, modelo de tabela e worker em segundo plano. |
 | tests/ | Testes determinísticos, sem chamadas externas. |
 

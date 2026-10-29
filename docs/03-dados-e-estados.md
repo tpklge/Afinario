@@ -2,7 +2,7 @@
 
 ## Persistência
 
-SQLite local, com WAL e chaves estrangeiras habilitadas por conexão, previsto para a próxima etapa. O banco residirá na área de dados do usuário retornada por platformdirs: convenções XDG no Linux e Library/Application Support no macOS. No Windows, usar a área local do usuário. O comando doctor informa os caminhos efetivos sem criar banco ou diretórios. Backups musicais terão local escolhido pelo usuário e não se confundem com cópias do banco.
+SQLite local, com WAL e chaves estrangeiras habilitadas por conexão, implementado para a biblioteca. A entrega atual, o esquema efetivo e os procedimentos de recuperação estão em [Persistência da biblioteca](13-persistencia-da-biblioteca.md). As entidades abaixo também descrevem etapas futuras; jobs, planos e operações musicais ainda não estão implementados. A migração 3 acrescenta análises de letras e revisões aprovadas por campo, conforme [Credenciais, letras e aprovação](14-credenciais-letras-e-aprovacao.md). O banco residirá na área de dados do usuário retornada por platformdirs: convenções XDG no Linux e Library/Application Support no macOS. No Windows, usar a área local do usuário. O comando doctor informa os caminhos efetivos sem criar banco ou diretórios. Backups musicais terão local escolhido pelo usuário e não se confundem com cópias do banco.
 
 UUIDs identificam entidades. Datas são armazenadas em UTC e exibidas no fuso local. Caminhos preservam Unicode e a grafia original; uma chave de comparação considera as regras do volume. Caminhos não são a identidade imutável de um arquivo.
 

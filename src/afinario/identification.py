@@ -13,13 +13,13 @@ from afinario.audd import AudD, AudDBudget
 from afinario.audio import audio_duration, extract_sample, fingerprint
 from afinario.cancellation import AnalysisCancelled, check_cancelled
 from afinario.config import Settings
-from afinario.domain import ProviderResult, RecordingCandidate, Status
+from afinario.domain import ProviderResult, RecordingCandidate, ReleaseCandidate, Status
 from afinario.inventory import InventoryRecord, is_link
 from afinario.metadata import MusicBrainz
 from afinario.probe import shazam_sample
 from afinario.provider_cache import ProviderCache, cache_key
 from afinario.providers import AcoustID
-from afinario.resolver import Decision, DecisionStatus, resolve
+from afinario.resolver import Decision, DecisionStatus, normalize, resolve
 from afinario.transport import ProviderError, Transport
 
 
@@ -50,6 +50,79 @@ class IdentificationReport:
             "source_sha256": self.source_sha256,
             "duration": self.duration,
         }
+
+
+def report_from_data(data):
+    data = dict(data)
+    decision = dict(data["decision"])
+    decision["status"] = DecisionStatus(decision["status"])
+    for key in ("reasons", "proposed_fields"):
+        decision[key] = tuple(decision[key])
+    results = []
+    for item in data["results"]:
+        item = dict(item)
+        item["status"] = Status(item["status"])
+        candidates = []
+        for value in item["candidates"]:
+            value = dict(value)
+            for key in ("title_aliases", "artist_aliases", "isrcs"):
+                value[key] = tuple(value.get(key, ()))
+            candidates.append(RecordingCandidate(**value))
+        item["candidates"] = tuple(candidates)
+        item["releases"] = tuple(ReleaseCandidate(**v) for v in item["releases"])
+        results.append(ProviderResult(**item))
+    return IdentificationReport(
+        **{**data, "decision": Decision(**decision), "results": tuple(results)}
+    )
+
+
+def compare_history(report: IdentificationReport, history: list[IdentificationReport]):
+    """A changed remote answer is evidence to review, never a silent replacement."""
+    decision = report.decision
+    if not report.source_sha256 or not decision.artist or not decision.title:
+        return report
+    previous = {}
+    for old in history:
+        value = old.decision
+        if old.source_sha256 != report.source_sha256 or not value.artist or not value.title:
+            continue
+        # Changes in typography/accents alone do not create a new identity.
+        same_names = (normalize(value.artist), normalize(value.title)) == (
+            normalize(decision.artist),
+            normalize(decision.title),
+        )
+        same_recording = not (
+            value.recording_id
+            and decision.recording_id
+            and value.recording_id != decision.recording_id
+        )
+        if same_names and same_recording:
+            continue
+        key = (normalize(value.artist), normalize(value.title), value.recording_id)
+        previous[key] = RecordingCandidate(
+            "previous", None, value.title, value.artist, recording_id=value.recording_id
+        )
+    if not previous:
+        return report
+    reasons = (
+        "O mesmo áudio recebeu identificações diferentes entre consultas. "
+        "Ouça a faixa e escolha a identificação em Revisar e aprovar.",
+        *(f"Anterior: {item.artist} — {item.title}" for item in previous.values()),
+        f"Nesta consulta: {decision.artist} — {decision.title}",
+    )
+    return replace(
+        report,
+        decision=Decision(DecisionStatus.CONFLICT, reasons=reasons),
+        results=(
+            *report.results,
+            ProviderResult(
+                "previous",
+                Status.OK,
+                "Propostas anteriores para este áudio; não contam como confirmação independente.",
+                tuple(previous.values()),
+            ),
+        ),
+    )
 
 
 def file_digest(path: Path, stop: threading.Event) -> str:
@@ -87,7 +160,18 @@ class IdentificationService:
             check_cancelled(self.stop)
             result = None if refresh else self.cache.get(key, provider)
             if result is None:
-                result = query()
+                try:
+                    result = query()
+                except AnalysisCancelled:
+                    raise
+                except ProviderError as exc:
+                    result = ProviderResult(provider, exc.status, str(exc), attempts=exc.attempts)
+                except Exception:
+                    result = ProviderResult(
+                        provider,
+                        Status.UNAVAILABLE,
+                        "Falha ao consultar este serviço. As outras fontes continuam disponíveis.",
+                    )
                 check_cancelled(self.stop)
                 self.cache.put(key, result)
         finally:
@@ -197,7 +281,7 @@ class IdentificationService:
                 )
             except ProviderError as exc:
                 results.append(ProviderResult("acoustid", exc.status, str(exc)))
-            except (ValueError, TypeError, KeyError):
+            except (OSError, ValueError, TypeError, KeyError):
                 results.append(
                     ProviderResult("acoustid", Status.AUDIO, "Fingerprint local inválido.")
                 )

@@ -51,6 +51,14 @@ def test_duplicate_fingerprints_for_same_recording_are_not_ambiguous():
     assert decision.status == DecisionStatus.AGREEMENT
 
 
+def test_duplicate_recording_names_are_stable_when_provider_changes_order():
+    first = candidate(title="Song")
+    alternate = replace(first, title="Another title", external_id="another")
+    a = resolve((result("acoustid", first, alternate),), 200)
+    b = resolve((result("acoustid", alternate, first),), 200)
+    assert a == b
+
+
 def test_known_alias_links_languages_without_arbitrary_substring_matching():
     primary = candidate(title="サムライハート(Some Like It Hot!!)", artist="SPYAIR")
     second = candidate("shazamio", title="Some Like It Hot!!", artist="SPYAIR")

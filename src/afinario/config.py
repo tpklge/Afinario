@@ -35,7 +35,7 @@ def acoustid_key_from_environment() -> str | None:
 class Settings:
     timeout_seconds: float = 30
     attempts: int = 2
-    user_agent: str = "Afinario/0.1.0 (local provider feasibility probe)"
+    user_agent: str = "Afinario/0.1.0 (https://github.com/tpklge/Afinario)"
     ffmpeg: str = "ffmpeg"
     ffprobe: str = "ffprobe"
     fpcalc: str = "fpcalc"
@@ -48,6 +48,28 @@ class Settings:
     @classmethod
     def load(cls, path: Path | None = None) -> "Settings":
         data = {} if path is None else tomllib.loads(path.read_text(encoding="utf-8"))
+        return cls.from_data(data)
+
+    def public_data(self) -> dict:
+        """Allowlist for persistence: credentials never become configuration data."""
+        return {
+            "network": {
+                "timeout_seconds": self.timeout_seconds,
+                "attempts": self.attempts,
+                "user_agent": self.user_agent,
+                "shazam_interval_seconds": self.shazam_interval_seconds,
+            },
+            "tools": {name: getattr(self, name) for name in ("ffmpeg", "ffprobe", "fpcalc")},
+            "processing": {
+                "analysis_workers": self.analysis_workers,
+                "audd_max_requests": self.audd_max_requests,
+            },
+        }
+
+    @classmethod
+    def from_data(cls, data: dict) -> "Settings":
+        if not isinstance(data, dict):
+            raise ValueError("Configuração deve ser um objeto.")
         if set(data) - {"network", "tools", "processing"}:
             raise ValueError("Seção de configuração desconhecida.")
         network, tools = data.get("network", {}), data.get("tools", {})

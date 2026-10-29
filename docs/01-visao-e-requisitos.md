@@ -6,7 +6,7 @@ Atender quem possui uma biblioteca local com nomes arbitrários, tags incompleta
 
 ## Escopo da primeira versão utilizável
 
-Linux primeiro, com referência inicial Ubuntu 24.04 x86_64; macOS 15 Sequoia ou superior posteriormente, com validações separadas em arm64 e x86_64. Windows continua como ambiente auxiliar de desenvolvimento, sem exclusividade de APIs. O escopo inclui seleção de múltiplas pastas; varredura opcionalmente recursiva; reconhecimento em múltiplos provedores; enriquecimento de metadados; consulta e comparação de letras; prévia por campo; escrita de tags; renomeação na mesma pasta; backup; recuperação; desfazer; pausa, retomada e relatório.
+Alvos atuais de desenvolvimento: macOS 15 Sequoia ou superior e Windows 11. Validar macOS separadamente em arm64 e x86_64. Linux, inicialmente Ubuntu 24.04 x86_64, continua como plataforma adicional. O núcleo não depende de APIs exclusivas de um desses sistemas. O escopo inclui seleção de múltiplas pastas; varredura opcionalmente recursiva; reconhecimento em múltiplos provedores; enriquecimento de metadados; consulta e comparação de letras; prévia por campo; escrita de tags; renomeação na mesma pasta; backup; recuperação; desfazer; pausa, retomada e relatório.
 
 MP3, M4A com AAC/ALAC, FLAC, Ogg Vorbis e Opus são os formatos prioritários para leitura e escrita. O suporte só será declarado após validação por formato. WMA, APE, WAV e AIFF ficam para uma etapa posterior. AAC bruto e formatos sem escrita validada poderão ser inventariados com indicação da limitação.
 
@@ -48,10 +48,10 @@ Ficam fora do escopo: reorganizar diretórios, baixar músicas, transcrever voca
 | ID | Requisito |
 |---|---|
 | RNF-01 | Rede, decodificação e escrita não executam na thread da interface. |
-| RNF-02 | A distribuição futura deve executar diretamente em Linux e macOS 15+, com pacote construído e validado por plataforma. Nesta etapa, a CLI exige Python instalado. |
+| RNF-02 | A distribuição futura deve executar diretamente em macOS 15+, Windows 11 e Linux, com pacote construído e validado por plataforma. Nesta etapa, a CLI exige Python instalado. |
 | RNF-03 | Resultados já armazenados podem ser revisados e aplicados offline. Novas consultas exigem rede. |
 | RNF-04 | Limites de acesso são compartilhados por provedor, independentemente do número de workers. |
-| RNF-05 | Credenciais persistentes usarão Secret Service no Linux e Keychain no macOS por adaptador; Credential Manager é opcional no Windows. Nesta prova, a chave vem apenas do ambiente. Logs e relatórios não expõem segredos. |
+| RNF-05 | Credenciais persistentes usam Keychain no macOS, WinVault no Windows 11 e Secret Service no Linux por adaptador. O ambiente é fallback quando ainda não há configuração salva. Logs e relatórios não expõem segredos. |
 | RNF-06 | SQLite possui migrações versionadas, integridade referencial e recuperação documentada. |
 | RNF-07 | Tabela de biblioteca utiliza modelo de dados que evite carregar widgets por arquivo. |
 | RNF-08 | Toda decisão aplicada mantém procedência, versão das regras e aprovação. |
@@ -68,4 +68,4 @@ Não inferir álbum, ano ou número de faixa apenas porque uma gravação aparec
 
 Letras existentes são preservadas por padrão. A substituição exige opção explícita e prévia. Não combinar versos de fontes discordantes, inventar metadados ausentes ou tratar tradução como original. Uma faixa identificada pode ser renomeada e ter tags corrigidas mesmo sem letra.
 
-A aplicação automática fica desativada inicialmente. Sua futura ativação exige configuração explícita, regras calibradas e apresentação do escopo de ações. A análise isolada permanece sem mutações nos arquivos.
+Por autorização do usuário em 28/10/2026, a renomeação automática após novos reconhecimentos fica habilitada inicialmente quando pelo menos duas fontes independentes concordam e as verificações de integridade passam. A preferência é visível e pode ser desativada em Aplicar e restaurar. A autorização foi ampliada pelo usuário para artista/título quando as fontes concordam e para letras ausentes compatíveis quando a identidade e as tags atuais estiverem validadas. As três preferências podem ser desativadas separadamente e toda gravação exige backup. Outros campos e divergências exigem aprovação por campo. Abrir a biblioteca não aplica propostas antigas. Consulte [Automação, lotes e relatórios](17-automacao-lotes-e-relatorios.md).

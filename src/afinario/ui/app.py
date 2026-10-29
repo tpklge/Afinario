@@ -13,7 +13,7 @@ QMainWindow { background: #151b24; }
 QWidget { background-color: #151b24; color: #e5eaf1; font-size: 13px; }
 QLabel#brand { font-size: 30px; font-weight: 700; color: #76ddc7; }
 QLabel#subtitle { color: #a8b4c4; }
-QListWidget, QTableView, QTextEdit, QLineEdit {
+QListWidget, QTableView, QTextEdit, QPlainTextEdit, QLineEdit {
     background: #1c2531; color: #e5eaf1; border: 1px solid #394757;
     border-radius: 5px; selection-background-color: #315d65;
 }
@@ -37,7 +37,12 @@ QCheckBox { spacing: 5px; }
 """
 
 
-def main(argv: list[str] | None = None, *, settings: Settings | None = None) -> int:
+def main(
+    argv: list[str] | None = None,
+    *,
+    settings: Settings | None = None,
+    restore_settings: bool = True,
+) -> int:
     args = sys.argv[1:] if argv is None else argv
     parser = argparse.ArgumentParser(description="Afinário desktop")
     parser.add_argument("folders", nargs="*", type=Path)
@@ -49,6 +54,7 @@ def main(argv: list[str] | None = None, *, settings: Settings | None = None) -> 
         )
         try:
             settings = Settings.load(config)
+            restore_settings = config is None
         except (OSError, ValueError):
             parser.error("Não foi possível carregar a configuração de reconhecimento.")
     configure_logging(settings.acoustid_key, settings.audd_token)
@@ -56,10 +62,11 @@ def main(argv: list[str] | None = None, *, settings: Settings | None = None) -> 
     app.setApplicationName("Afinário")
     app.setStyle("Fusion")
     app.setStyleSheet(STYLE)
-    window = MainWindow(settings)
-    # Optional positional folders make launching a chosen library straightforward.
-    for value in parsed.folders:
-        window.add_folder(value)
+    window = MainWindow(
+        settings,
+        restore_settings=restore_settings,
+        folders=parsed.folders if parsed.folders else None,
+    )
     window.show()
     return app.exec()
 

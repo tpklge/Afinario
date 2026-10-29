@@ -1,15 +1,18 @@
 import argparse
 import json
 import logging
-from dataclasses import asdict
+import sqlite3
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
 from afinario import __version__
 from afinario.config import Settings
+from afinario.credentials import CredentialError, CredentialStore
 from afinario.diagnostics import doctor
 from afinario.domain import Status
 from afinario.inventory import ALL_FORMATS, scan
+from afinario.library import LibraryError, LibraryStore
 from afinario.logging_config import configure_logging
 from afinario.probe import lyrics_probe, recognition_probe
 from afinario.transport import Transport
@@ -67,6 +70,12 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError):
         root.error("Não foi possível carregar a configuração; confira o TOML e seus valores.")
     configure_logging(settings.acoustid_key, settings.audd_token)
+    if args.command in ("doctor", "probe"):
+        try:
+            settings = CredentialStore().apply(settings)
+        except CredentialError as exc:
+            logging.getLogger("afinario").warning("%s", exc)
+        configure_logging(settings.acoustid_key, settings.audd_token)
     try:
         if args.command == "gui":
             try:
@@ -76,19 +85,54 @@ def main(argv: list[str] | None = None) -> int:
                     "Interface não instalada. Instale o extra gui: pip install -e '.[gui]'."
                 )
                 return 2
-            return desktop_main([str(path) for path in args.folders], settings=settings)
+            return desktop_main(
+                [str(path) for path in args.folders],
+                settings=settings,
+                restore_settings=config is None,
+            )
         if args.command == "doctor":
             report = {"schema_version": 1, "environment": doctor(settings)}
             code = 0
         elif args.command == "scan":
             records, issues = [], []
-            summary = scan(
-                args.folders,
-                recursive=not args.no_recursive,
-                formats=frozenset(args.formats) if args.formats else ALL_FORMATS,
-                on_record=records.append,
-                on_issue=issues.append,
-            )
+            with LibraryStore() as library:
+                try:
+                    previous = library.load().preferences
+                except (ValueError, KeyError, TypeError):
+                    raise LibraryError(
+                        "As preferências salvas estão inválidas; revise a biblioteca."
+                    ) from None
+                preferences = replace(
+                    previous,
+                    roots=tuple(str(path.absolute()) for path in args.folders),
+                    recursive=not args.no_recursive,
+                    formats=tuple(sorted(args.formats or ALL_FORMATS)),
+                    settings=settings.public_data()
+                    if args.config is not None
+                    else previous.settings,
+                )
+                run_id = library.start_scan(preferences)
+
+                def save_issue(issue):
+                    library.save_scan_issue(run_id, issue)
+                    issues.append(issue)
+
+                try:
+                    summary = scan(
+                        args.folders,
+                        recursive=preferences.recursive,
+                        formats=frozenset(preferences.formats),
+                        on_record=lambda record: records.extend(
+                            library.save_scan_records(run_id, [record])
+                        ),
+                        on_issue=save_issue,
+                    )
+                    library.finish_run(run_id, "completed", asdict(summary))
+                except BaseException as exc:
+                    library.finish_run(
+                        run_id, "cancelled" if isinstance(exc, KeyboardInterrupt) else "failed", {}
+                    )
+                    raise
             report = {
                 "schema_version": 1,
                 "generated_at": datetime.now(UTC).isoformat(),
@@ -140,6 +184,12 @@ def main(argv: list[str] | None = None) -> int:
                 handle.write(output + "\n")
         print(output)
         return code
+    except LibraryError as exc:
+        logging.getLogger("afinario").error("%s", exc)
+        return 2
+    except sqlite3.Error:
+        logging.getLogger("afinario").error("Falha ao salvar a biblioteca local; confira o banco.")
+        return 2
     except OSError:
         logging.getLogger("afinario").error(
             "Falha de acesso local. O relatório precisa de um caminho novo e gravável."

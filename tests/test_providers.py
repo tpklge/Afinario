@@ -8,6 +8,26 @@ from afinario.domain import LyricCandidate, ProviderResult, Status
 from afinario.providers import AcoustID, LRCLib, LyricsOVH
 
 
+def test_acoustid_http_400_key_rejection_is_reported_and_suspends_provider(transport_factory):
+    calls = []
+
+    def handler(request):
+        calls.append(request)
+        return httpx.Response(
+            400, json={"status": "error", "error": {"code": 4, "message": "PRIVATE-TOKEN"}}
+        )
+
+    provider = AcoustID(transport_factory(handler), "PRIVATE-TOKEN")
+    first = provider.lookup("fingerprint", 100)
+    second = provider.lookup("fingerprint", 100)
+    assert first.status == second.status == Status.AUTH
+    assert first.attempts == 1
+    assert second.attempts == 0
+    assert len(calls) == 1
+    assert "chave de aplicação" in first.message
+    assert "PRIVATE-TOKEN" not in str(first.summary())
+
+
 def test_lrclib_normalizes_instrumental_and_synced(transport_factory):
     response = [
         {

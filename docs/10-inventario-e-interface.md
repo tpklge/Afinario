@@ -2,7 +2,7 @@
 
 ## Entrega
 
-Inventário somente leitura e interface Qt Widgets em português. A varredura não faz consultas externas, não utiliza FFmpeg e não exige credencial. A ação Identificar foi acrescentada posteriormente nos itens 6 a 8, conforme [Reconhecimento](11-reconhecimento-e-resolucao.md). A persistência da biblioteca (item 3) não foi antecipada: fechar a aplicação descarta os resultados e decisões em memória; respostas de provedores ficam em um cache separado.
+Inventário somente leitura e interface Qt Widgets em português. A varredura não faz consultas externas, não utiliza FFmpeg e não exige credencial. A ação Identificar foi acrescentada posteriormente nos itens 6 a 8, conforme [Reconhecimento](11-reconhecimento-e-resolucao.md). Atualização: a [persistência da biblioteca](13-persistencia-da-biblioteca.md), antigo item 3, está implementada. Fechar e reabrir restaura o inventário e as propostas; respostas de provedores continuam em um cache separado.
 
 ## Abrir
 
@@ -57,4 +57,4 @@ Um teste real de symlinks é pulado quando a conta não tem permissão para cri�
 
 ## Próximas dependências
 
-O inventário atual usa UUIDs novos por leitura, sem identidade persistente entre execuções. O reconhecimento integrado à interface e o cache de consultas foram acrescentados nos itens 6 a 8. A base SQLite da biblioteca, retomada persistente de lotes, aprovação de alterações, escritores de tags e desfazer continuam futuros. Não há botão de aplicação.
+A leitura isolada do inventário gera UUIDs efêmeros; a biblioteca SQLite atribui UUIDs persistentes por caminho ao integrar cada leitura. O reconhecimento integrado à interface e o cache de consultas foram acrescentados nos itens 6 a 8. A base SQLite da biblioteca está implementada. A aprovação por campo está implementada. Retomada persistente de jobs, escritores de tags e desfazer continuam futuros. Não há botão de aplicação.

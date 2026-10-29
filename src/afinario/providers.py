@@ -138,6 +138,7 @@ class AcoustID:
                 self.name,
                 "POST",
                 "https://api.acoustid.org/v2/lookup",
+                application_error_statuses=(400,),
                 data={
                     "client": self.key,
                     "duration": str(round(duration)),
@@ -154,7 +155,13 @@ class AcoustID:
                 if code == 13:
                     status = Status.RATE_LIMIT
                 self.transport.record_failure(self.name, status)
-                raise ProviderError(status, "AcoustID recusou a consulta.", attempts)
+                message = (
+                    "AcoustID recusou a chave de aplicação (client). "
+                    "Confira a chave em Serviços e ferramentas."
+                    if status == Status.AUTH
+                    else "AcoustID recusou a consulta."
+                )
+                raise ProviderError(status, message, attempts)
             if data.get("status") != "ok" or not isinstance(data.get("results"), list):
                 raise ValueError("Invalid response")
             candidates = []

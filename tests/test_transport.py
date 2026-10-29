@@ -101,6 +101,16 @@ def test_network_exception_is_sanitized(transport_factory):
     assert "SECRET" not in str(error.value)
 
 
+@pytest.mark.parametrize("body", [{"status": "ok", "results": []}, {}, []])
+def test_http_error_cannot_masquerade_as_success(transport_factory, body):
+    transport = transport_factory(lambda _: httpx.Response(400, json=body))
+    with pytest.raises(ProviderError) as error:
+        transport.json(
+            "acoustid", "POST", "https://example.test", application_error_statuses=(400,)
+        )
+    assert error.value.status == Status.INVALID
+
+
 def test_retry_after_date_and_invalid():
     date = format_datetime(datetime.now(UTC) + timedelta(seconds=30))
     assert 28 <= Transport.retry_after(date) <= 31

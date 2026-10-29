@@ -22,7 +22,7 @@ DECISION_LABELS = {
     DecisionStatus.INCOMPLETE: "Confirmação incompleta",
     DecisionStatus.CONFLICT: "Revisão necessária",
     DecisionStatus.NO_MATCH: "Não identificada",
-    DecisionStatus.PENDING: "Análise pendente",
+    DecisionStatus.PENDING: "Consulta bloqueada ou falhou",
     DecisionStatus.CHANGED: "Arquivo alterado",
 }
 
@@ -117,6 +117,17 @@ def _enriched(
 
 
 def _leader(candidates: list[RecordingCandidate], provider: str):
+    def order(item):
+        return (
+            -(item.score or 0),
+            normalize(item.artist or ""),
+            normalize(item.title or ""),
+            item.recording_id or "",
+            item.external_id or "",
+            item.artist or "",
+            item.title or "",
+        )
+
     groups: dict[tuple, RecordingCandidate] = {}
     for candidate in candidates:
         key = (
@@ -129,9 +140,9 @@ def _leader(candidates: list[RecordingCandidate], provider: str):
             )
         )
         previous = groups.get(key)
-        if previous is None or (candidate.score or 0) > (previous.score or 0):
+        if previous is None or order(candidate) < order(previous):
             groups[key] = candidate
-    values = sorted(groups.values(), key=lambda item: item.score or 0, reverse=True)
+    values = sorted(groups.values(), key=order)
     if not values:
         return None, False
     # Provisional guardrails, not calibrated probabilities or automatic approval criteria.

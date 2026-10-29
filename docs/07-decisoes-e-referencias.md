@@ -4,7 +4,7 @@
 
 | ID | Decisão | Fundamento / situação |
 |---|---|---|
-| ADR-01 | Aplicação local, Linux prioritário e macOS 15+ posteriormente. | Atualiza a plataforma Windows do roteiro conforme solicitação posterior do usuário; serviços externos apenas para consultas configuradas. |
+| ADR-01 | Aplicação local para macOS 15+ e Windows 11, com Linux adicional. | Orientação atual de desenvolvimento entre macOS e Windows 11; substitui a prioridade anterior Linux/macOS. Serviços externos apenas para consultas configuradas. |
 | ADR-02 | Separar analisar e aplicar. | Permitir revisão, trabalho offline e proteção dos originais. |
 | ADR-03 | Preservar diretório original. | Restrição central, aplicada em planejador e executor. |
 | ADR-04 | Provedores por adaptadores. | Permitir substituição sem espalhar contratos externos pelo domínio. |
