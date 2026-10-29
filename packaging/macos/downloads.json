@@ -1,0 +1,20 @@
+[
+  {
+    "name": "ffmpeg",
+    "file": "ffmpeg-9.0.2.tar.gz",
+    "url": "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/refs/tags/n9.0.2",
+    "sha256": "6e374ed621e48faa40639307dff48ba6fe574a509977956d2cce9669b7cc27e9"
+  },
+  {
+    "name": "fpcalc",
+    "file": "chromaprint-fpcalc-1.6.2-macos-arm64.tar.gz",
+    "url": "https://github.com/acoustid/chromaprint/releases/download/v1.6.2/chromaprint-fpcalc-1.6.2-macos-arm64.tar.gz",
+    "sha256": "f3bc56cb42d89a01237bb3f3629329e4ec75f7c1b0217acf6e9bf952ac47979b"
+  },
+  {
+    "name": "chromaprint-source",
+    "file": "chromaprint-1.6.2-source.tar.gz",
+    "url": "https://codeload.github.com/acoustid/chromaprint/tar.gz/refs/tags/v1.6.2",
+    "sha256": "7f92ea1141429b43f695a1ba56d5058132f89fae5f137ce705afc57734f6b5fa"
+  }
+]

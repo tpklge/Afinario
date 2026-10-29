@@ -1,6 +1,10 @@
 version = 1
 revision = 5
 requires-python = ">=3.11, <3.14"
+resolution-markers = [
+    "sys_platform == 'darwin'",
+    "sys_platform != 'darwin'",
+]
 
 [[package]]
 name = "afinario"
@@ -19,13 +23,20 @@ dev = [
     { name = "ruff" },
 ]
 gui = [
-    { name = "pyside6-addons" },
-    { name = "pyside6-essentials" },
+    { name = "pyside6-addons", version = "6.11.3", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'darwin'" },
+    { name = "pyside6-addons", version = "6.12.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
+    { name = "pyside6-essentials", version = "6.11.3", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'darwin'" },
+    { name = "pyside6-essentials", version = "6.12.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
 ]
 gui-test = [
-    { name = "pyside6-addons" },
-    { name = "pyside6-essentials" },
+    { name = "pyside6-addons", version = "6.11.3", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'darwin'" },
+    { name = "pyside6-addons", version = "6.12.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
+    { name = "pyside6-essentials", version = "6.11.3", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform == 'darwin'" },
+    { name = "pyside6-essentials", version = "6.12.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
     { name = "pytest-qt" },
+]
+macos-build = [
+    { name = "pyinstaller", marker = "sys_platform == 'darwin'" },
 ]
 recognition = [
     { name = "shazamio" },
@@ -40,17 +51,22 @@ requires-dist = [
     { name = "keyring", specifier = "==25.7.0" },
     { name = "mutagen", specifier = "==1.48.1" },
     { name = "platformdirs", specifier = "==4.13.6" },
+    { name = "pyinstaller", marker = "sys_platform == 'darwin' and extra == 'macos-build'", specifier = "==6.22.3" },
     { name = "pyinstaller", marker = "sys_platform == 'win32' and extra == 'windows-build'", specifier = "==6.22.3" },
-    { name = "pyside6-addons", marker = "extra == 'gui'", specifier = "==6.12.0" },
-    { name = "pyside6-addons", marker = "extra == 'gui-test'", specifier = "==6.12.0" },
-    { name = "pyside6-essentials", marker = "extra == 'gui'", specifier = "==6.12.0" },
-    { name = "pyside6-essentials", marker = "extra == 'gui-test'", specifier = "==6.12.0" },
+    { name = "pyside6-addons", marker = "sys_platform == 'darwin' and extra == 'gui'", specifier = "==6.11.3" },
+    { name = "pyside6-addons", marker = "sys_platform == 'darwin' and extra == 'gui-test'", specifier = "==6.11.3" },
+    { name = "pyside6-addons", marker = "sys_platform != 'darwin' and extra == 'gui'", specifier = "==6.12.0" },
+    { name = "pyside6-addons", marker = "sys_platform != 'darwin' and extra == 'gui-test'", specifier = "==6.12.0" },
+    { name = "pyside6-essentials", marker = "sys_platform == 'darwin' and extra == 'gui'", specifier = "==6.11.3" },
+    { name = "pyside6-essentials", marker = "sys_platform == 'darwin' and extra == 'gui-test'", specifier = "==6.11.3" },
+    { name = "pyside6-essentials", marker = "sys_platform != 'darwin' and extra == 'gui'", specifier = "==6.12.0" },
+    { name = "pyside6-essentials", marker = "sys_platform != 'darwin' and extra == 'gui-test'", specifier = "==6.12.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==9.2.0" },
     { name = "pytest-qt", marker = "extra == 'gui-test'", specifier = "==4.5.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.17.3" },
     { name = "shazamio", marker = "extra == 'recognition'", specifier = "==0.9.0" },
 ]
-provides-extras = ["recognition", "dev", "gui", "gui-test", "windows-build"]
+provides-extras = ["recognition", "dev", "gui", "gui-test", "windows-build", "macos-build"]
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -518,6 +534,18 @@ wheels = [
 ]
 
 [[package]]
+name = "macholib"
+version = "1.16.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "altgraph" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/2f/97589876ea967487978071c9042518d28b958d87b17dceb7cdc1d881f963/macholib-1.16.4.tar.gz", hash = "sha256:f408c93ab2e995cd2c46e34fe328b130404be143469e41bc366c807448979362", size = 59427, upload-time = "2025-11-22T08:28:38.373Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/d1/a9f36f8ecdf0fb7c9b1e78c8d7af12b8c8754e74851ac7b94a8305540fc7/macholib-1.16.4-py2.py3-none-any.whl", hash = "sha256:da1a3fa8266e30f0ce7e97c6a54eefaae8edd1e5f86f3eb8b95457cae90265ea", size = 38117, upload-time = "2025-11-22T08:28:36.939Z" },
+]
+
+[[package]]
 name = "more-itertools"
 version = "11.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -814,14 +842,16 @@ version = "6.22.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "altgraph" },
+    { name = "macholib", marker = "sys_platform != 'win32'" },
     { name = "packaging" },
-    { name = "pefile" },
+    { name = "pefile", marker = "sys_platform == 'win32'" },
     { name = "pyinstaller-hooks-contrib" },
-    { name = "pywin32-ctypes" },
+    { name = "pywin32-ctypes", marker = "sys_platform == 'win32'" },
     { name = "setuptools" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/63/41/f90302845945abd4ed647933ff5ee7c6ac93983187be67f897b6cb613331/pyinstaller-6.22.3.tar.gz", hash = "sha256:05eb2f5615503e72939a7224d68b4aff572c6b0438ee4a17d0a4b481f399362d", size = 4437180, upload-time = "2026-09-12T21:54:09.669Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/af/898f70947e27f8e65d55183c780e77112e023c0b4a6fba6255d4d563a27d/pyinstaller-6.22.3-py3-none-macosx_10_13_universal2.whl", hash = "sha256:052f4a1cd4f81092ccb7a18fe8ebc9ecf832a5917317e39fb3775af4e959b253", size = 1071847, upload-time = "2026-09-12T21:53:01.711Z" },
     { url = "https://files.pythonhosted.org/packages/c5/87/cf28cfd42ceca889171e6dd5e7f1553d4372db83d047049ffb7cf95fcbd4/pyinstaller-6.22.3-py3-none-win32.whl", hash = "sha256:46a3e30a118341a1ec20667a5a95aa7e0aa8c4fa129893c0151b3eb3f801a722", size = 1390905, upload-time = "2026-09-12T21:53:38.133Z" },
     { url = "https://files.pythonhosted.org/packages/24/83/c5422204772a27aef643280fdc887b7ef55679989096b21dceb1b9625fc4/pyinstaller-6.22.3-py3-none-win_amd64.whl", hash = "sha256:500bd58c7bf7e584a8435adccbd763a0b918d5c12b08d74ff50fd79b2915458b", size = 1454907, upload-time = "2026-09-12T21:53:44.812Z" },
     { url = "https://files.pythonhosted.org/packages/67/2e/ebc93968bf63f81b122e205da116b16036b653b7ce2cc8ad86e3ddd19586/pyinstaller-6.22.3-py3-none-win_arm64.whl", hash = "sha256:31df3cc4261e804a53d358b7897c293ec8b88b167a7cca06c78018085c855f97", size = 1402956, upload-time = "2026-09-12T21:53:51.369Z" },
@@ -841,13 +871,30 @@ wheels = [
 
 [[package]]
 name = "pyside6-addons"
-version = "6.12.0"
+version = "6.11.3"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform == 'darwin'",
+]
 dependencies = [
-    { name = "pyside6-essentials" },
+    { name = "pyside6-essentials", version = "6.11.3", source = { registry = "https://pypi.org/simple" } },
+    { name = "shiboken6", version = "6.11.3", source = { registry = "https://pypi.org/simple" } },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/16/c401d6455dbf49df37a8b142883e12d446abf51919c3e0ef5d9570e29160/pyside6_addons-6.12.0-cp310-abi3-macosx_14_0_universal2.whl", hash = "sha256:1d9bcd294ce1c9829194c7d13b01f771a2254b86cb3462cc3399321d2797fdac", size = 90545550, upload-time = "2026-10-08T09:08:14.778Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/4c/5a1a8e0ad9171da89070a492b0217296203078475fb4c9ba2145f0e44b7f/pyside6_addons-6.11.3-cp310-abi3-macosx_13_0_universal2.whl", hash = "sha256:a9af3d2719578f2bb8899098754183d5bee9c8d707b777aac98e10f2e9e55002", size = 332537986, upload-time = "2026-10-26T12:49:14.022Z" },
+]
+
+[[package]]
+name = "pyside6-addons"
+version = "6.12.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform != 'darwin'",
+]
+dependencies = [
+    { name = "pyside6-essentials", version = "6.12.0", source = { registry = "https://pypi.org/simple" } },
+]
+wheels = [
     { url = "https://files.pythonhosted.org/packages/ff/3e/0d6c5934de575286ac0699a701d4155048185035b8da0ee78d57a38bc7ef/pyside6_addons-6.12.0-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:4ab38c0017f0453671a9313d3a53ca1c0e378924f54b07e596bcea94a9642391", size = 59192702, upload-time = "2026-10-08T09:08:21.13Z" },
     { url = "https://files.pythonhosted.org/packages/94/14/b6c5683614601448c3ea8f19613ca378db75158ba594b662a8a8041e3e5f/pyside6_addons-6.12.0-cp310-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:48cd0b639c06c9f79685f340ccae4319614b66d6efcdf06c2ce3836790d8c46e", size = 63646547, upload-time = "2026-10-08T09:08:26.921Z" },
     { url = "https://files.pythonhosted.org/packages/02/41/ba3d52fe2acd942ebf71eb02b3bdf0897f7f6f4ce8f52289cb50228e48d3/pyside6_addons-6.12.0-cp310-abi3-win_amd64.whl", hash = "sha256:98d8d62010da6605344cee83e5c96fb846170a1f2d924523f10f5d92078b02b0", size = 40522402, upload-time = "2026-10-08T09:08:31.678Z" },
@@ -856,13 +903,29 @@ wheels = [
 
 [[package]]
 name = "pyside6-essentials"
-version = "6.12.0"
+version = "6.11.3"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform == 'darwin'",
+]
 dependencies = [
-    { name = "shiboken6" },
+    { name = "shiboken6", version = "6.11.3", source = { registry = "https://pypi.org/simple" } },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/90/d528f8dd3f9f20712bc719e10c698d27c998e1dd76ed3f33b6fb606d0972/pyside6_essentials-6.12.0-cp310-abi3-macosx_14_0_universal2.whl", hash = "sha256:0867b709a724db28b161227c7d6ecb5ed10cc09226a53542417ac6dee1308239", size = 116002775, upload-time = "2026-10-08T09:09:54.453Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/48/55362ced49bf8dafd4220c38cc0a0acb4b822cb60ea91e777007a3c1ec81/pyside6_essentials-6.11.3-cp310-abi3-macosx_13_0_universal2.whl", hash = "sha256:e153290e03ef5bae4b29c584db0193e14d291a21c32030f6953fe98879b3202c", size = 111067342, upload-time = "2026-10-26T12:50:43.961Z" },
+]
+
+[[package]]
+name = "pyside6-essentials"
+version = "6.12.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform != 'darwin'",
+]
+dependencies = [
+    { name = "shiboken6", version = "6.12.0", source = { registry = "https://pypi.org/simple" } },
+]
+wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/3c/7597d8dcb36aa8315427635ec6ec9d850ffbad4ce78b9118ac854889f2d3/pyside6_essentials-6.12.0-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:16f4b5e41daf49235ae048458243da9efe5f3d8040f9cc5aa454ce69893d3bd9", size = 84346433, upload-time = "2026-10-08T09:10:02.825Z" },
     { url = "https://files.pythonhosted.org/packages/5e/4e/f4fd4c016719be832ec49d3c87940459e87fd666179a0a199a3998d07916/pyside6_essentials-6.12.0-cp310-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:08c5841063fc1df69b7fa1ee405f539e66576a83fc48004be3e2c5e35ccbfa69", size = 83810102, upload-time = "2026-10-08T09:10:09.13Z" },
     { url = "https://files.pythonhosted.org/packages/03/61/9a7e32a37b224f68506785bfb0f288d516098ec71681782d72b695a6c95d/pyside6_essentials-6.12.0-cp310-abi3-win_amd64.whl", hash = "sha256:c9a95102aa23c1f86516a30d5a9be37552d324eee7e567eb7508973f1218cb42", size = 82153795, upload-time = "2026-10-08T09:10:15.104Z" },
@@ -990,10 +1053,23 @@ wheels = [
 
 [[package]]
 name = "shiboken6"
+version = "6.11.3"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform == 'darwin'",
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/3f/75730e62db2597eadc0076ab8c264912fec6d54cdf506b0326229404825c/shiboken6-6.11.3-cp310-abi3-macosx_13_0_universal2.whl", hash = "sha256:9287279112201e18a7820d29ce9dc4ceca4148c681f4189aff6f4cea652d43af", size = 476645, upload-time = "2026-10-26T12:51:35.699Z" },
+]
+
+[[package]]
+name = "shiboken6"
 version = "6.12.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "sys_platform != 'darwin'",
+]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/45/11536fba5f50a57671eb14441c6098096f3e57074e54c9d7d66039a5831e/shiboken6-6.12.0-cp310-abi3-macosx_14_0_universal2.whl", hash = "sha256:47105e05baf57d35453e07d240bbe59cb4b8d9565377ea5134ff9fb37d4f5c02", size = 479653, upload-time = "2026-10-08T09:10:41.506Z" },
     { url = "https://files.pythonhosted.org/packages/49/c2/a04fa003b4360e99d8e3fc2829abacf37396ace63ea1cd616402209ec7c6/shiboken6-6.12.0-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:3bde565bb0890044b5c7f63808adddede5abc241e9395a2bfed61919884d6240", size = 279268, upload-time = "2026-10-08T09:10:42.982Z" },
     { url = "https://files.pythonhosted.org/packages/97/ca/a4415e6218e0dff764fe2b2d30db2fc8f499a08ace07634232ade3f73adc/shiboken6-6.12.0-cp310-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:ff72a72b3277b418902d562b987b33a6f6818bed9fe40a49d634d09bc67f620e", size = 276562, upload-time = "2026-10-08T09:10:44.25Z" },
     { url = "https://files.pythonhosted.org/packages/2a/b6/bee97e7a2edeab72aafabb46ee5adc939790a638d107860b4cad7a20e407/shiboken6-6.12.0-cp310-abi3-win_amd64.whl", hash = "sha256:a1906cb8116869178c64b6bab52623bbc8b4ceed7b30bfc3c9aa0f6e67f6438e", size = 1265476, upload-time = "2026-10-08T09:10:45.627Z" },

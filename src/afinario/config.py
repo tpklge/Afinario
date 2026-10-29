@@ -61,7 +61,10 @@ class Settings:
                 "user_agent": self.user_agent,
                 "shazam_interval_seconds": self.shazam_interval_seconds,
             },
-            "tools": {name: getattr(self, name) for name in ("ffmpeg", "ffprobe", "fpcalc")},
+            "tools": {
+                name: name if getattr(self, name) == bundled_tool(name) else getattr(self, name)
+                for name in ("ffmpeg", "ffprobe", "fpcalc")
+            },
             "processing": {
                 "analysis_workers": self.analysis_workers,
                 "audd_max_requests": self.audd_max_requests,

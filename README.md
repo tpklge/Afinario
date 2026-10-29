@@ -10,6 +10,8 @@ Afinário é um organizador local de músicas com desenvolvimento em macOS e Win
 
 **Windows 11 x64:** há um [instalador com as dependências incluídas](docs/19-instalador-windows.md), gerado em `dist/installers`. Abra o instalador com dois cliques; depois use o atalho **Afinário** no menu Iniciar ou na área de trabalho. Não exige Python instalado nem terminal. O pacote inicial é destinado à validação privada e ainda não tem assinatura digital.
 
+**macOS 15+ Apple Silicon:** há [pacotes `.pkg` e `.dmg` com as dependências incluídas](docs/20-instalador-macos.md), gerados em `dist/installers`. Instale pelo assistente ou arraste o aplicativo para Aplicativos. Não exige Python nem Homebrew. A build para validação privada usa assinatura ad hoc, sem notarização Apple; Macs Intel precisam de outra build.
+
 Requer Python 3.11–3.13. A implementação executa diretamente no sistema operacional, sem Wine. Python é interpretado; não há promessa de binário autossuficiente nesta etapa. A interface desktop usa Qt Widgets, sem navegador.
 
 Linux/macOS, com uv 0.13.6 instalado:
@@ -57,6 +59,7 @@ O usuário seleciona pastas, analisa músicas, compara propostas e aplica altera
 17. [Automação, lotes e relatórios](docs/17-automacao-lotes-e-relatorios.md): tags e letras automáticas, aprovações maiores, pausa, retomada e exportação.
 18. [Teste no Windows 11](docs/18-teste-no-windows-11.md): preparação pelo código-fonte, ferramentas, credenciais e roteiro de homologação.
 19. [Instalador Windows](docs/19-instalador-windows.md): instalação sem Python, atalhos, build e validação do pacote.
+20. [Instalador macOS](docs/20-instalador-macos.md): pacotes Apple Silicon com Python e ferramentas incluídos, compatibilidade, geração e teste dos artefatos.
 
 ## Repositório de destino
 

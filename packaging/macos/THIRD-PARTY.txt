@@ -1,0 +1,31 @@
+Afinário: componentes do pacote macOS para validação privada
+
+Python, PySide6/Qt, Shiboken, Mutagen, HTTPX, Keyring, ShazamIO e suas
+dependências mantêm suas licenças. Avisos em python-packages/ e
+Python-LICENSE.txt. As bibliotecas Qt são frameworks separados,
+sem alteração, em Contents/Frameworks/PySide6/Qt/lib.
+
+FFmpeg/ffprobe 9.0.2: compilados desta versão com ferramentas nativas,
+sem componentes GPL, sem bibliotecas externas e sem rede. Esta build
+é dedicada ao áudio: leitura dos formatos suportados pelo Afinário,
+extração PCM, verificação de integridade e FLAC. Não é uma instalação
+geral de FFmpeg para conversão de vídeo. Licença LGPL 2.1 ou posterior.
+Código-fonte em sources/ffmpeg-9.0.2.tar.gz; receita em
+ffmpeg-build-recipe.py. A configuração também aparece em ffmpeg -version.
+
+Chromaprint/fpcalc 1.6.2: binário oficial AcoustID macOS arm64.
+https://github.com/acoustid/chromaprint/releases/tag/v1.6.2
+Fonte Chromaprint em sources/chromaprint-1.6.2-source.tar.gz.
+Os termos do código Chromaprint e de dependências incorporadas à build
+binária são distintos; os arquivos em chromaprint-source/ contêm os
+avisos disponíveis na fonte. Os URLs e hashes são registrados em downloads.json.
+
+PyInstaller: https://pyinstaller.org/ (bootloader com exceção de distribuição).
+Qt: https://code.qt.io/cgit/qt/
+PySide: https://code.qt.io/cgit/pyside/pyside-setup.git/
+Python: https://github.com/astral-sh/python-build-standalone
+
+Pacote para uso e validação privados. Antes de distribuição pública,
+consolidar fontes/receitas correspondentes de todas as dependências,
+definir a licença Afinário e providenciar assinatura/notarização Apple.
+Este aviso não substitui licenças de terceiros.

@@ -1,0 +1,22 @@
+Afinário para macOS 15 ou superior — Apple Silicon (M1/M2/M3/M4 e posteriores)
+
+Instalar pelo DMG: abra a imagem e arraste Afinario.app para Aplicativos.
+Alternativa: abra o arquivo .pkg e siga o assistente de instalação.
+Escolha apenas uma das opções. Feche o Afinário antes de atualizar.
+
+Python, Qt, player, FFmpeg, ffprobe, fpcalc e as bibliotecas já estão
+incluídos. Não é necessário Homebrew, Git, uv ou terminal para executar.
+Configure suas chaves em Serviços e ferramentas; não há chaves no pacote.
+Consultas online continuam dependendo de internet e dos serviços do usuário.
+
+Banco, configurações, cache e backups ficam nas pastas de dados do usuário,
+fora do aplicativo. Excluir o aplicativo não exclui músicas ou backups.
+
+Esta build para validação privada usa assinatura ad hoc. Ela não tem
+certificado Developer ID nem notarização Apple. Se o macOS bloquear a
+abertura, use a opção Abrir Mesmo Assim em Ajustes do Sistema >
+Privacidade e Segurança, depois de conferir a origem do pacote.
+Não é necessário desativar o Gatekeeper.
+
+Esta versão é arm64; ela não é um pacote para Macs Intel.
+Avisos e licenças: Afinario.app/Contents/Resources/notices.
