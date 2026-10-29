@@ -11,6 +11,8 @@ O pacote é para **Apple Silicon (arm64), macOS 15 ou superior**. São geradas d
 
 Escolha uma das opções. Feche o aplicativo antes de atualizar e execute a cópia instalada, em vez da cópia dentro da imagem montada. O aplicativo aparece como **Afinário** e inclui Python, Qt Widgets/Multimedia, bibliotecas, ShazamIO, FFmpeg, ffprobe e fpcalc. Não exige instalação de Homebrew, Git, uv ou Python no computador de destino.
 
+Download: [release v0.1.0](https://github.com/tpklge/Afinario/releases/tag/v0.1.0), junto do instalador Windows original. Os pacotes Mac vêm do commit `57135c8`, indicado no manifesto de build; a tag original `v0.1.0` continua apontando para o commit Windows `af96796`. Os arquivos de código-fonte gerados automaticamente pelo GitHub para essa tag representam a build Windows. Código e receitas atualizados dos dois sistemas estão na branch `main`.
+
 Esta build é para validação privada. O aplicativo usa assinatura ad hoc e o instalador não tem assinatura Developer ID Installer nem notarização Apple. Se o macOS bloquear a abertura, confira a origem e use **Abrir Mesmo Assim** em **Ajustes do Sistema → Privacidade e Segurança**. Não é necessário desativar o Gatekeeper. Não há certificado Developer ID disponível nesta máquina para uma distribuição notarizada.
 
 Chaves AcoustID/AudD são configuradas em **Serviços e ferramentas…** e continuam no Keychain do usuário. Credenciais, banco, cache, configurações locais e músicas não são entradas da build. O aplicativo mantém os dados nos locais existentes de `Application Support`, `Caches` e `Logs`; excluir o aplicativo não apaga biblioteca, músicas ou backups. Consultas aos provedores continuam dependendo da internet e das contas/cotas do usuário.

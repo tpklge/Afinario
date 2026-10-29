@@ -4,6 +4,8 @@
 
 O arquivo `dist/installers/Afinario-0.1.0-windows-x64-setup.exe` instala o Afinário em Windows 11 x64. Abra o instalador com dois cliques e siga o assistente em português. A instalação é por usuário, sem exigir privilégios de administrador. Ao terminar, abra **Afinário** no menu Iniciar ou pelo atalho da área de trabalho.
 
+Download: [release v0.1.0](https://github.com/tpklge/Afinario/releases/tag/v0.1.0). A mesma release também reúne os pacotes macOS; o executável e o SHA-256 Windows originais foram preservados. As receitas de ambos os sistemas estão na branch `main`.
+
 Não é necessário instalar Python, Git, uv, Qt ou ferramentas de áudio, nem usar linha de comando. O pacote inclui o runtime Python, Qt Widgets/Multimedia, dependências dos provedores, ShazamIO, FFmpeg, ffprobe e fpcalc. O executável principal é `Afinario.exe`; a pasta `_internal` e `AfinarioWorker.exe` fazem parte do aplicativo e precisam permanecer junto dele.
 
 As chaves AcoustID/AudD são configuradas em **Serviços e ferramentas…**. Credenciais pessoais não acompanham o instalador. Inventário, reprodução e operações de arquivos são locais; consultas aos serviços e busca de letras precisam de internet e das credenciais aplicáveis. As cotas e a assinatura AudD continuam sendo do usuário.
