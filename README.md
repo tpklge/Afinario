@@ -8,6 +8,8 @@ Afinário é um organizador local de músicas com desenvolvimento em macOS e Win
 
 ## Executar a base
 
+**Windows 11 x64:** há um [instalador com as dependências incluídas](docs/19-instalador-windows.md), gerado em `dist/installers`. Abra o instalador com dois cliques; depois use o atalho **Afinário** no menu Iniciar ou na área de trabalho. Não exige Python instalado nem terminal. O pacote inicial é destinado à validação privada e ainda não tem assinatura digital.
+
 Requer Python 3.11–3.13. A implementação executa diretamente no sistema operacional, sem Wine. Python é interpretado; não há promessa de binário autossuficiente nesta etapa. A interface desktop usa Qt Widgets, sem navegador.
 
 Linux/macOS, com uv 0.13.6 instalado:
@@ -17,7 +19,7 @@ uv sync --locked --extra gui --extra recognition
 uv run --no-sync python -m afinario gui
 ```
 
-No Windows, com o ambiente já preparado: `.\.venv\Scripts\python.exe -m afinario gui`. É possível passar pastas como argumentos para pré-carregar a lista de origens. Para baixar, preparar as dependências e testar os recursos, siga o [guia de teste no Windows 11](docs/18-teste-no-windows-11.md). O instalador com dependências incluídas ainda não foi implementado.
+No Windows, para executar pelo código-fonte com o ambiente já preparado: `.\.venv\Scripts\python.exe -m afinario gui`. É possível passar pastas como argumentos para pré-carregar a lista de origens. Para baixar, preparar as dependências e testar os recursos, siga o [guia de teste no Windows 11](docs/18-teste-no-windows-11.md).
 
 Para inventário sem interface: `uv run --no-sync python -m afinario scan '/caminho/das/musicas'`. Funciona offline, sem chave e sem FFmpeg. O extra `recognition` continua opcional para a prova de reconhecimento. Consulte o [guia de desenvolvimento](docs/08-desenvolvimento.md) e o [guia do inventário](docs/10-inventario-e-interface.md).
 
@@ -54,6 +56,7 @@ O usuário seleciona pastas, analisa músicas, compara propostas e aplica altera
 
 17. [Automação, lotes e relatórios](docs/17-automacao-lotes-e-relatorios.md): tags e letras automáticas, aprovações maiores, pausa, retomada e exportação.
 18. [Teste no Windows 11](docs/18-teste-no-windows-11.md): preparação pelo código-fonte, ferramentas, credenciais e roteiro de homologação.
+19. [Instalador Windows](docs/19-instalador-windows.md): instalação sem Python, atalhos, build e validação do pacote.
 
 ## Repositório de destino
 

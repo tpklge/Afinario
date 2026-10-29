@@ -23,7 +23,7 @@ def test_exports_include_results_batches_and_redact_secrets_without_full_lyrics(
         job.finish("paused", "api_token=TEST-TOKEN")
         target = tmp_path / "report.json"
         export_report(library, target, secrets=("TEST-TOKEN",))
-        text = target.read_text()
+        text = target.read_text(encoding="utf-8")
         assert "TEST-TOKEN" not in text and "FULL LYRIC MUST NOT APPEAR" not in text
         data = json.loads(text)
         assert len(data["files"]) == 1
@@ -36,7 +36,7 @@ def test_exports_include_results_batches_and_redact_secrets_without_full_lyrics(
         with pytest.raises(FileExistsError):
             export_report(library, target)
         export_report(library, tmp_path / "selected.json", file_ids=[])
-        assert not json.loads((tmp_path / "selected.json").read_text())["files"]
+        assert not json.loads((tmp_path / "selected.json").read_text(encoding="utf-8"))["files"]
 
 
 @pytest.mark.parametrize("value", ["=1+1", "+1", "-10", "@SUM(A1:A2)", "\t=1", " =1"])

@@ -4,6 +4,14 @@ Este plano descreve a evolução do projeto. A base técnica dos itens 1 e 2 est
 
 ## Entregas e dependências
 
+### Situação atualizada em 29/10/2026
+
+O usuário informou que já realizou testes com músicas reais da própria biblioteca, incluindo faixas presentes em suas playlists do Spotify, usadas como referência de identificação. Com essa confirmação, os itens **2 (homologação do fluxo com músicas reais)** e **4 (validação das identificações e da automação na amostra conhecida)** da lista de pendências apresentada na conversa são considerados atendidos no escopo testado pelo usuário. Esses números se referem à lista de pendências, e não às etapas E2/E4 abaixo. Não foram fornecidas métricas quantitativas, tamanho da amostra ou uma relação dos formatos e cenários exercitados; não se atribuem números a essa validação.
+
+A suíte automatizada também foi executada nativamente em Windows 11, conforme o [registro de validação](18-teste-no-windows-11.md). As referências históricas deste plano à ausência de piloto e de testes nativos Windows devem ser lidas com essas atualizações. Permanecem separados os testes de instalador, arquiteturas, volumes, escala e aparelhos específicos, além da distribuição e demais funcionalidades pendentes.
+
+Foi acrescentada a geração do [instalador Windows autossuficiente](19-instalador-windows.md), com runtime Python, Qt e auxiliares de áudio incluídos, atalhos e desinstalador. Trata-se de um pacote inicial para validação privada; distribuição pública, assinatura e homologação em máquina limpa permanecem separadas.
+
 | Etapa | Entrega futura | Condição de saída |
 |---|---|---|
 | E0 | Prova de provedores e licenças. | Confirmar integrações reais, credenciais, versões, envio de dados, limites e viabilidade do segundo reconhecedor. |

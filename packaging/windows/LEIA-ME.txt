@@ -1,0 +1,17 @@
+Afinário — Windows 11 x64
+
+Abra pelo atalho Afinário no menu Iniciar ou na área de trabalho.
+Python, Qt, ShazamIO, FFmpeg, ffprobe e fpcalc estão incluídos.
+Não é necessário instalar Python, Git, uv ou usar o terminal.
+
+Em “Serviços e ferramentas…”, configure as chaves AcoustID/AudD.
+As chaves são pessoais e não acompanham o instalador. O token AudD
+é salvo no cofre do Windows. Reconhecimento e busca de letras exigem
+internet; inventário, reprodução e operações locais funcionam offline.
+O limite AudD começa em zero; habilite-o conforme sua assinatura.
+
+Atualizações preservam biblioteca, preferências e backups, guardados
+fora da pasta de instalação. Desinstalar remove somente o aplicativo.
+
+Os avisos de terceiros estão em _internal/notices. Este pacote inicial
+é para validação privada e ainda não possui assinatura Authenticode.

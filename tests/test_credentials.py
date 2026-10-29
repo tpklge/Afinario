@@ -67,15 +67,20 @@ def test_invalid_bundle_is_not_silently_replaced(payload):
 
 
 def test_git_ignores_local_secrets_and_database_files():
-    paths = ".env\n.env.local\ncredentials.local.json\nlibrary.sqlite3\nlibrary.sqlite3-wal\n"
+    paths = [
+        ".env",
+        ".env.local",
+        "credentials.local.json",
+        "library.sqlite3",
+        "library.sqlite3-wal",
+    ]
     result = subprocess.run(
-        ["git", "check-ignore", "--stdin"],
-        input=paths,
-        text=True,
+        ["git", "check-ignore", "--stdin", "-z"],
+        input=("\0".join(paths) + "\0").encode("utf-8"),
         capture_output=True,
         check=True,
     )
-    assert result.stdout.splitlines() == paths.splitlines()
+    assert result.stdout.decode("utf-8").split("\0")[:-1] == paths
 
 
 def test_explicit_native_backend_selection_without_using_insecure_plugins(monkeypatch):

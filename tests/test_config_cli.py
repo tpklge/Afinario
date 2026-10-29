@@ -3,11 +3,13 @@ import logging
 import shutil
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from afinario.cli import main
 from afinario.config import Settings, app_paths
+from afinario.diagnostics import doctor
 from afinario.logging_config import RedactSecrets
 
 
@@ -73,8 +75,35 @@ def test_doctor_offline_and_report_does_not_overwrite(tmp_path, monkeypatch, cap
     assert target.read_bytes() == b"original music bytes"
     fresh = tmp_path / "doctor.json"
     assert main(["doctor", "--report", str(fresh)]) == 0
-    assert json.loads(fresh.read_text())["environment"]["network_used"] is False
+    assert json.loads(fresh.read_text(encoding="utf-8"))["environment"]["network_used"] is False
     assert "network_used" in capsys.readouterr().out
+
+
+def test_doctor_runs_tools_without_console_and_handles_unicode_paths(monkeypatch, tmp_path):
+    from afinario.cancellation import hidden_process_options
+
+    executable = str(tmp_path / "ferramentas de áudio 日本語" / "tool.exe")
+    calls = []
+    monkeypatch.setattr("afinario.diagnostics.shutil.which", lambda _: executable)
+    for name in ("system", "release", "machine", "python_version"):
+        monkeypatch.setattr(f"afinario.diagnostics.platform.{name}", lambda: "test-platform")
+
+    def execute(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return SimpleNamespace(returncode=0, stdout="tool versão 1.0\n", stderr="")
+
+    monkeypatch.setattr("afinario.diagnostics.subprocess.run", execute)
+    report = doctor(Settings(acoustid_key="PRIVATE-KEY", audd_token="PRIVATE-TOKEN"))
+    assert len(calls) == 3
+    for argv, kwargs in calls:
+        assert argv == [executable, "-version"]
+        assert kwargs.get("creationflags") == hidden_process_options().get("creationflags")
+        assert not kwargs.get("shell", False)
+        assert kwargs["encoding"] == "utf-8"
+        assert kwargs["timeout"] == 5
+    assert all(tool["available"] for tool in report["tools"].values())
+    assert "PRIVATE" not in json.dumps(report)
+    assert report["network_used"] is False
 
 
 def test_logs_redact_secret_and_sensitive_parameters():

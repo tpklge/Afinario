@@ -1,6 +1,6 @@
 # Teste no Windows 11
 
-Guia de 29/10/2026 para testar o código-fonte atual. O instalador com Python e ferramentas incluídos ainda não foi implementado.
+Guia de 29/10/2026 para testar o código-fonte atual. Para instalação sem Python ou terminal, veja o [instalador Windows](19-instalador-windows.md).
 
 ## Preparar e abrir
 
@@ -45,3 +45,24 @@ Remove-Item Env:QT_QPA_PLATFORM
 A variável `QT_QPA_PLATFORM` deve estar removida antes de abrir a interface normalmente. Os testes usam dados isolados, sem chamadas reais aos provedores. Para testes de escrita de tags e restauração de áudio, FFmpeg precisa estar disponível no PATH; alguns testes são pulados quando ele não está disponível.
 
 Ao registrar um problema, inclua formato, ação, mensagem exibida e versão do código (`git rev-parse --short HEAD`). Relatórios exportados incluem caminhos/metadados locais; compartilhe somente o necessário. Tokens não são necessários para diagnosticar mensagens.
+
+## Validação executada em 29/10/2026
+
+Execução nativa em Windows 11 Pro x64, build 26100, Python 3.11.9 e Qt/PySide6 6.12.0, sobre o commit 576521f e dois ajustes locais de portabilidade nos testes. Dependências sincronizadas pelo uv.lock, incluindo keyring e Qt Multimedia. FFmpeg 9.0.2, ffprobe e fpcalc 1.6.2 ficaram disponíveis no PATH apenas dos processos de teste e da aplicação.
+
+Resultado: **316 testes aprovados e um pulado** pela falta de permissão da conta para criar links simbólicos. Escrita/renomeação, backups, restauração, recuperação de interrupções, persistência, relatórios, credenciais e interface foram exercitados pela suíte em dados isolados. Ruff, formatação e consistência das dependências passaram. Relatório local: `reports/windows-tests-20261029.xml`, ignorado pelo Git.
+
+Dois testes trazidos do macOS precisaram de ajustes: usar entrada/saída binária delimitada por NUL em git check-ignore para evitar conversão CRLF, e ler relatórios JSON explicitamente como UTF-8 em vez da codificação padrão do Windows. Não houve alteração no comportamento do aplicativo para essas correções.
+
+Após os testes, a interface foi iniciada normalmente, com janela nativa visível e responsiva. Não foram iniciadas consultas pagas ou operações de escrita na biblioteca musical real. A validação automatizada não substitui os testes manuais de reprodução, dispositivos e instalador descritos acima.
+
+## Ajustes de compatibilidade Windows/macOS
+
+- Os testes de arquivos ignorados pelo Git usam protocolo binário delimitado por NUL, evitando a conversão CRLF do Windows e mantendo o mesmo comportamento no macOS/Linux.
+- Os testes leem relatórios JSON explicitamente em UTF-8, incluindo acentos e caracteres japoneses, sem depender da codificação padrão do sistema.
+- O diagnóstico das ferramentas locais usa a opção de processo sem console no Windows, como os demais auxiliares de áudio. No macOS/Linux, essa opção não é enviada. Caminhos continuam sendo argumentos separados, sem interpretação por shell.
+- A CI mantém Windows, macOS 15 e Linux. O job desktop exige FFmpeg/ffprobe no PATH antes dos testes, para impedir que a ausência dessas ferramentas oculte a validação de escrita e recuperação; os resultados JUnit ficam disponíveis como artefatos por plataforma.
+
+Os testes reais de biblioteca e identificação relatados pelo usuário foram aceitos conforme a [atualização do plano](06-plano-e-validacao.md). Esta preparação mantém uma única base de código; a execução local nesta máquina verifica Windows, enquanto a execução em macOS é responsabilidade do respectivo job da CI ou de uma máquina macOS.
+
+Após esses ajustes, a suíte completa passou novamente no Windows: **317 testes aprovados e um pulado**, ainda por restrição da conta à criação de links simbólicos. O teste adicional verifica a execução do diagnóstico sem console auxiliar, argumentos com espaços/Unicode e ausência de credenciais no resultado. Ruff e formatação passaram. Relatório local: `reports/windows-compatibility-20261029.xml`. Os novos jobs da CI não foram executados remotamente nesta preparação.

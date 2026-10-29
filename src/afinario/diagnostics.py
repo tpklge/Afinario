@@ -3,6 +3,7 @@ import platform
 import shutil
 import subprocess
 
+from afinario.cancellation import hidden_process_options
 from afinario.config import Settings, app_paths
 
 
@@ -21,6 +22,7 @@ def doctor(settings: Settings) -> dict:
                     errors="replace",
                     timeout=5,
                     check=False,
+                    **hidden_process_options(),
                 )
                 if result.returncode == 0:
                     version = (result.stdout or result.stderr).splitlines()[0][:200]

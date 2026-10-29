@@ -1,0 +1,31 @@
+Afinário: componentes do pacote Windows de validação privada
+
+Python, PySide6/Qt (Essentials e Addons), Shiboken, Mutagen, HTTPX,
+Keyring, ShazamIO e suas dependências mantêm suas licenças próprias.
+As licenças presentes nas distribuições Python estão em python-packages/.
+Python-LICENSE.txt contém a licença do runtime Python incluído.
+Os módulos Qt são DLLs separadas em _internal/PySide6 e não são modificados.
+
+FFmpeg/ffprobe 9.0.2: executáveis separados, build essentials de Gyan Doshi,
+GPL v3 ou posterior. Licença e configuração da build em ffmpeg/.
+https://www.gyan.dev/ffmpeg/builds/
+Fonte FFmpeg da versão: https://github.com/FFmpeg/FFmpeg/tree/n9.0.2
+Fontes/receitas das bibliotecas externas da build devem acompanhar uma
+redistribuição pública conforme os termos aplicáveis; apenas o link acima
+não representa uma oferta de código-fonte correspondente completo.
+
+Chromaprint/fpcalc 1.6.2: executável separado do projeto AcoustID.
+https://github.com/acoustid/chromaprint/releases/tag/v1.6.2
+Fonte: https://github.com/acoustid/chromaprint/tree/v1.6.2
+Licenças em chromaprint-LICENSE.md e LGPL-2.1.txt. A licença do código
+Chromaprint e as licenças da build binária/dependências são distintas.
+
+Qt 6.12: https://code.qt.io/cgit/qt/
+PySide: https://code.qt.io/cgit/pyside/pyside-setup.git/
+ShazamIO: https://github.com/shazamio/ShazamIO
+PyInstaller: https://pyinstaller.org/ (bootloader com exceção de distribuição).
+
+Este pacote é para uso e validação privados. Antes de distribuição pública,
+consolidar fontes correspondentes/receitas dos componentes copyleft e definir
+a licença do código Afinário. Nenhuma licença dos componentes de terceiros
+é substituída por este aviso. downloads.json registra URLs e hashes dos binários.

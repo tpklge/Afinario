@@ -57,4 +57,11 @@ jobs:
       - name: Install FFmpeg on Windows if missing
         if: runner.os == 'Windows'
         run: if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) { choco install ffmpeg -y --no-progress }
-      - run: uv run --no-sync python -m pytest
+      - name: Require audio tools for integration tests
+        run: uv run --no-sync python -c "import shutil; assert all(shutil.which(tool) for tool in ('ffmpeg', 'ffprobe')), 'FFmpeg/ffprobe missing from PATH'"
+      - run: uv run --no-sync python -m pytest --junitxml=reports/desktop-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-tests-${{ matrix.os }}
+          path: reports/desktop-tests.xml

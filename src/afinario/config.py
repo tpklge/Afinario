@@ -8,6 +8,8 @@ from pathlib import Path
 
 from platformdirs import PlatformDirs
 
+from afinario.runtime import bundled_tool
+
 
 def secret_from_environment(name: str) -> str | None:
     value = os.environ.get(name)
@@ -36,9 +38,9 @@ class Settings:
     timeout_seconds: float = 30
     attempts: int = 2
     user_agent: str = "Afinario/0.1.0 (https://github.com/tpklge/Afinario)"
-    ffmpeg: str = "ffmpeg"
-    ffprobe: str = "ffprobe"
-    fpcalc: str = "fpcalc"
+    ffmpeg: str = field(default_factory=lambda: bundled_tool("ffmpeg"))
+    ffprobe: str = field(default_factory=lambda: bundled_tool("ffprobe"))
+    fpcalc: str = field(default_factory=lambda: bundled_tool("fpcalc"))
     acoustid_key: str | None = field(default=None, repr=False)
     analysis_workers: int = 2
     shazam_interval_seconds: float = 3
@@ -122,7 +124,10 @@ class Settings:
             shazam_interval_seconds=float(interval),
             audd_token=secret_from_environment("AFINARIO_AUDD_TOKEN"),
             audd_max_requests=paid_limit,
-            **tools,
+            **{
+                name: bundled_tool(name) if value == name else value
+                for name, value in tools.items()
+            },
         )
 
 

@@ -7,10 +7,11 @@ import time
 from pathlib import Path
 
 from afinario.audio import audio_duration, extract_sample, fingerprint
-from afinario.cancellation import hidden_process_options, run_cancellable, worker_interpreter
+from afinario.cancellation import hidden_process_options, run_cancellable
 from afinario.config import Settings
 from afinario.domain import ProviderResult, RecordingCandidate, Status
 from afinario.providers import AcoustID, LRCLib, LyricsOVH, text
+from afinario.runtime import shazam_command
 from afinario.transport import ProviderError, Transport
 
 
@@ -25,7 +26,7 @@ def shazam_sample(
     try:
         if cancelled is None:
             process = subprocess.run(
-                [worker_interpreter(), "-m", "afinario.shazam_worker", str(path)],
+                shazam_command(path),
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -35,7 +36,7 @@ def shazam_sample(
             )
         else:
             process = run_cancellable(
-                [worker_interpreter(), "-m", "afinario.shazam_worker", str(path)],
+                shazam_command(path),
                 timeout=timeout,
                 cancelled=cancelled,
             )
